@@ -1,0 +1,15 @@
+{
+  "lint": {
+    "rules": {
+      "exclude": ["prefer-const", "require-yield"]
+    }
+  },
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "revolution"
+  },
+  "imports": {
+    "revolution/jsx-runtime": "./jsx-runtime.ts"
+  }
+}
