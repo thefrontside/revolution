@@ -1,7 +1,6 @@
 import { CurrentDocument, CurrentSlot } from "../render.ts";
-import { createScope, type Operation, type Scope } from "../deps/effection.ts";
+import { type Operation } from "../deps/effection.ts";
 import {
-  afterEach,
   beforeEach,
   createHTMLDocument,
   describe,
@@ -13,25 +12,19 @@ import {
 type HTMLButton = Operation<HTMLButtonElement>;
 
 describe("render", () => {
-  let scope: Scope;
-  let destroy: () => Promise<void>;
-  beforeEach(() => {
-    [scope, destroy] = createScope();
+  beforeEach(function* (scope) {
     scope.set(CurrentDocument, createHTMLDocument());
   });
-  afterEach(() => destroy());
 
-  it("can render a button", async () => {
+  it("can render a button", function* () {
     let nodes: Node[] = [];
-    scope.set(CurrentSlot, {
+    yield* CurrentSlot.set({
       replace: (...n) => nodes = n,
     });
 
-    await scope.run(function* () {
-      let button = yield* <button>{"Click Me"}</button> as HTMLButton;
-      expectType<Element>(button);
-      expect(nodes).toEqual([button]);
-      expect(button.childNodes).toBeDefined();
-    });
+    let button = yield* <button>{"Click Me"}</button> as HTMLButton;
+    expectType<Element>(button);
+    expect(nodes).toEqual([button]);
+    expect(button.childNodes).toBeDefined();
   });
 });

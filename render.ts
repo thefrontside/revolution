@@ -7,14 +7,19 @@ export const CurrentDocument = createContext<Document>("document");
 
 type ASTNode = hast.Element | hast.Text | hast.Root;
 
-export function render(jsx: JSX.Element): Operation<Element> {
+export function render(jsx: JSX.Element): Operation<Node[] | Text | Element> {
   return {
     *[Symbol.iterator]() {
       let doc = yield* CurrentDocument;
       let nodes = toNodes(jsx, doc);
       let slot = yield* CurrentSlot;
       slot.replace(...nodes);
-      return nodes[0]! as Element;
+      if (jsx.type === "root") {
+        return nodes;
+      } else {
+        let [node] = nodes;
+        return jsx.type === "text" ? node as Text : node as Element;
+      }
     },
   };
 }

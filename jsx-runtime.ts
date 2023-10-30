@@ -5,11 +5,13 @@ import { render } from "./render.ts";
 
 export type JSXChild = string | number | boolean | JSXElement;
 
-export type HASTElement = hast.Element & Operation<Element>;
-export type HASTFragment = hast.Root & Operation<Node[]>;
-export type HASTText = hast.Text & Operation<Text>;
+export type HASTElement = hast.Element;
+export type HASTFragment = hast.Root;
+export type HASTText = hast.Text;
 
-export type JSXElement = HASTElement | HASTText | HASTFragment;
+export type JSXElement =
+  & (hast.Element | hast.Root | hast.Text)
+  & Operation<Element | Node[] | Text>;
 
 export type JSXElementProps = Record<string, string> & {
   children?: JSXChild | JSXChild[];
