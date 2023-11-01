@@ -88,7 +88,7 @@ export function Fragment(
 
 function read(children?: JSXChild | JSXChild[]): (hast.Element | hast.Text)[] {
   let nodes = Array.isArray(children) ? children : (children ? [children] : []);
-  return nodes.flatMap((child) => {
+  return nodes.flatMap((child = "") => {
     switch (typeof child) {
       case "number":
       case "boolean":

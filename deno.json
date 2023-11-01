@@ -1,4 +1,7 @@
 {
+  "tasks": {
+    "test": "deno test --allow-read --allow-env --allow-run"
+  },
   "lint": {
     "rules": {
       "exclude": ["prefer-const", "require-yield"]
