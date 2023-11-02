@@ -4,8 +4,9 @@ import {
   expect,
   type Operation,
   type Scope,
+  resource,
   suspend,
-} from "../deps/effection.ts";
+} from "../lib/deps/effection.ts";
 
 export { expect } from "https://deno.land/x/expect@v0.2.9/mod.ts";
 export * from "npm:ts-expect";
@@ -73,3 +74,14 @@ Object.defineProperty(Promise.prototype, Symbol.iterator, {
     return expect(this)[Symbol.iterator];
   },
 });
+
+export function useObjectURL(object: File | Blob | MediaSource): Operation<string> {
+  return resource<string>(function* (provide) {
+    let url = URL.createObjectURL(object);
+    try {
+      yield* provide(url);
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  });
+}

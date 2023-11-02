@@ -15,7 +15,7 @@ export function useBuilder(): Operation<Builder> {
         *build(url: string) {
           let result = yield* expect<BuildResult>(esbuild.build({
             plugins: [...denoPlugins({
-              configPath: new URL("deno.json", import.meta.url).pathname,
+              configPath: new URL("../deno.json", import.meta.url).pathname,
             })],
             entryPoints: [Deno.cwd() + "/" + url],
             jsx: "automatic",

@@ -1,5 +1,5 @@
-import { CurrentDocument, CurrentSlot } from "../render.ts";
-import { type Operation } from "../deps/effection.ts";
+import { CurrentDocument, CurrentSlot } from "../lib/render.ts";
+import { type Operation } from "../lib/deps/effection.ts";
 import {
   beforeEach,
   createHTMLDocument,

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "./suite.ts";
+import { describe, expect, it, useObjectURL } from "./suite.ts";
 import { useBuilder } from "../mod.ts";
 
 describe("island builder", () => {
@@ -18,16 +18,3 @@ describe("island builder", () => {
     expect(mod.initial(0).tagName).toEqual("button");
   });
 });
-
-import { resource } from "../deps/effection.ts";
-
-function useObjectURL(object: File | Blob | MediaSource) {
-  return resource<string>(function* (provide) {
-    let url = URL.createObjectURL(object);
-    try {
-      yield* provide(url);
-    } finally {
-      URL.revokeObjectURL(url);
-    }
-  });
-}
