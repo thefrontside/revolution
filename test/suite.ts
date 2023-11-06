@@ -4,20 +4,21 @@ import {
   expect,
   type Operation,
   type Scope,
-  resource,
   suspend,
 } from "../lib/deps/effection.ts";
+export { assert } from "https://deno.land/std@0.205.0/assert/mod.ts";
 
 export { expect } from "https://deno.land/x/expect@v0.2.9/mod.ts";
-export * from "npm:ts-expect";
+export { expectType } from "npm:ts-expect";
 
 let error: Error | void = void (0);
 let scope: Scope | void = void (0);
 
-export function describe<T>(name: string, def: () => void): bdd.TestSuite<T> {
+function describeWithScope<T>(...args: bdd.DescribeArgs<T>): bdd.TestSuite<T> {
   let destroy: (() => Promise<void>) | void = void (0);
 
-  return bdd.describe(name, () => {
+  let [name, def] = args;
+  return bdd.describe(name as string, () => {
     bdd.beforeEach(() => {
       if (!scope) {
         [scope, destroy] = createScope();
@@ -32,9 +33,17 @@ export function describe<T>(name: string, def: () => void): bdd.TestSuite<T> {
         }
       }
     });
-    def();
+
+    if (def && typeof def === "function") {
+      def();
+    }
   });
 }
+
+describeWithScope.only = bdd.describe.only;
+describeWithScope.ignore = bdd.describe.ignore;
+
+export const describe: typeof bdd.describe = describeWithScope;
 
 export function beforeEach(op: (scope: Scope) => Operation<void>): void {
   bdd.beforeEach(() => {
@@ -52,8 +61,12 @@ export function beforeEach(op: (scope: Scope) => Operation<void>): void {
   });
 }
 
-export function it(desc: string, op: () => Operation<void>): void {
-  return bdd.it(desc, () => scope!.run(op));
+export function it(desc: string, op?: () => Operation<void>): void {
+  if (op) {
+    return bdd.it(desc, () => scope!.run(op));
+  } else {
+    return bdd.it.ignore(desc, () => {});
+  }
 }
 
 import { DOMImplementation } from "https://deno.land/x/deno_dom@v0.1.41/deno-dom-wasm.ts";
@@ -74,14 +87,3 @@ Object.defineProperty(Promise.prototype, Symbol.iterator, {
     return expect(this)[Symbol.iterator];
   },
 });
-
-export function useObjectURL(object: File | Blob | MediaSource): Operation<string> {
-  return resource<string>(function* (provide) {
-    let url = URL.createObjectURL(object);
-    try {
-      yield* provide(url);
-    } finally {
-      URL.revokeObjectURL(url);
-    }
-  });
-}

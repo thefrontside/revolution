@@ -1,4 +1,4 @@
-import * as html from "https://deno.land/x/hastx@v0.0.6/html.ts";
+import * as html from "https://deno.land/x/hastx@v0.0.8/html.ts";
 import * as hast from "./lib/deps/hast.ts";
 import type { Operation } from "./lib/deps/effection.ts";
 import { render } from "./lib/render.ts";
@@ -30,7 +30,7 @@ export interface JSXElementConstructor {
 }
 
 declare global {
-  namespace JSX {
+  export namespace JSX {
     type Element = JSXElement;
     type ElementType = keyof html.HTMLElements | JSXElementConstructor;
 

@@ -1,5 +1,6 @@
-import { describe, expect, it, useObjectURL } from "./suite.ts";
+import { describe, expect, it } from "./suite.ts";
 import { useBuilder } from "../mod.ts";
+import { useObjectURL } from "../lib/object-url.ts";
 
 describe("island builder", () => {
   it("can build a tsx module with the revolution transform", function* () {
