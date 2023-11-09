@@ -1,25 +1,22 @@
-import type { Slot } from "./types.ts";
-import * as hast from "./deps/hast.ts";
+import type { JSXElement, Slot } from "./types.ts";
 import { createContext, type Operation } from "./deps/effection.ts";
 
 export const CurrentSlot = createContext<Slot>("slot");
 export const CurrentDocument = createContext<Document>("document");
 
-type ASTNode = hast.Element | hast.Text | hast.Root;
+export function* useDocument() {
+  return yield* CurrentDocument;
+}
 
-export function render(jsx: JSX.Element): Operation<Node[] | Text | Element> {
+type ASTNode = JSXElement;
+
+export function render(jsx: JSXElement): Operation<void> {
   return {
     *[Symbol.iterator]() {
       let doc = yield* CurrentDocument;
       let nodes = toNodes(jsx, doc);
       let slot = yield* CurrentSlot;
       slot.replace(...nodes);
-      if (jsx.type === "root") {
-        return nodes;
-      } else {
-        let [node] = nodes;
-        return jsx.type === "text" ? node as Text : node as Element;
-      }
     },
   };
 }

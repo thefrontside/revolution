@@ -1,61 +1,76 @@
-import {
-  createContext,
-  type Operation,
-  type Result,
-} from "./deps/effection.ts";
-import { useBuilder } from "./builder.ts";
-import { useObjectURL } from "./object-url.ts";
-import { call } from "./deps/effection.ts";
+import type { HASTFragment, JSXElement } from "./types.ts";
+
+import { createContext, type Operation } from "./deps/effection.ts";
+
+export const CollectedIslands = createContext<IslandCollection>(
+  "revolution.IslandCollection",
+);
+
+export interface IslandModule<TArgs extends unknown[] = unknown[]> {
+  default?(...args: TArgs): Operation<void>;
+  placeholder?(...args: TArgs): JSXElement;
+}
+
+export interface IslandCollection {
+  nextId: number;
+  invocations: Record<string, IslandInvocation>;
+  seen: Set<string>;
+  modules: Record<string, IslandModule>;
+}
+
+interface IslandInvocation {
+  id: string;
+  location: string;
+  args: unknown[];
+}
 
 export function* island(
   location: string,
-  argument?: unknown,
+  ...args: unknown[]
 ): Operation<JSX.Element> {
-  let result = yield* useIslandModule(location);
+  let collection = yield* CollectedIslands;
 
-  if (result.ok) {
-    let { placeholder } = result.value;
-    return placeholder(argument);
-  } else {
-    throw result.error;
+  let mod = collection.modules[location];
+  if (!mod) {
+    let error = new Error(`no known island: '${location}'`);
+    error.name = "MissingIslandError";
+    throw error;
   }
-}
 
-interface IslandModule {
-  operation(): Operation<void>;
-  placeholder(argument: unknown): JSX.Element;
-}
+  let id = String(collection.nextId++);
+  collection.seen.add(location);
+  collection.invocations[id] = { id, location, args };
+  let { placeholder } = mod;
 
-export const IslandPath = createContext<string>("island-path");
-
-export function* useIslandModule(
-  path: string,
-): Operation<Result<IslandModule>> {
-  let base = yield* IslandPath;
-
-  let builder = yield* useBuilder({
-    path: base,
-  });
-
-  let bytes = yield* builder.build(path);
-
-  let blob = new Blob([bytes], {
-    type: "text/javascript",
-  });
-
-  let url = yield* useObjectURL(blob);
-
-  return createIslandModule(yield* call(import(url)));
-}
-
-//deno-lint-ignore no-explicit-any
-function createIslandModule(mod: any): Result<IslandModule> {
-  let { operation, placeholder } = mod;
-  return {
-    ok: true,
-    value: {
-      operation,
-      placeholder,
-    },
+  let slot: HASTFragment = {
+    type: "root",
+    children: [
+      {
+        type: "comment",
+        value: `island@${id}`,
+      },
+    ],
   };
+
+  if (placeholder) {
+    if (typeof placeholder === "string") {
+      slot.children.push({
+        type: "text",
+        value: placeholder,
+      });
+    } else if (typeof placeholder === "function") {
+      let content = placeholder(...args);
+      if (content.type === "root") {
+        slot.children.push(...content.children);
+      } else {
+        slot.children.push(content);
+      }
+    }
+  }
+  slot.children.push({
+    type: "comment",
+    value: `/island@${id}`,
+  });
+
+  return slot;
 }

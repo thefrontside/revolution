@@ -1,1 +1,1 @@
-export * from "https://deno.land/x/hastx@v0.0.8/deps.ts";
+export * from "npm:@types/hast@^3.0.0";

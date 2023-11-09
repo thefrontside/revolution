@@ -1,3 +1,4 @@
+import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.42/deno-dom-wasm.ts";
 import * as bdd from "https://deno.land/std@0.163.0/testing/bdd.ts";
 import {
   createScope,
@@ -6,8 +7,8 @@ import {
   type Scope,
   suspend,
 } from "../lib/deps/effection.ts";
-export { assert } from "https://deno.land/std@0.205.0/assert/mod.ts";
-
+import { assert } from "https://deno.land/std@0.205.0/assert/mod.ts";
+export { assert };
 export { expect } from "https://deno.land/x/expect@v0.2.9/mod.ts";
 export { expectType } from "npm:ts-expect";
 
@@ -69,12 +70,26 @@ export function it(desc: string, op?: () => Operation<void>): void {
   }
 }
 
+it.only = function only(desc: string, op?: () => Operation<void>): void {
+  if (op) {
+    return bdd.it.only(desc, () => scope!.run(op));
+  } else {
+    return bdd.it.ignore(desc, () => {});
+  }
+};
+
 import { DOMImplementation } from "https://deno.land/x/deno_dom@v0.1.41/deno-dom-wasm.ts";
 import { CTOR_KEY } from "https://deno.land/x/deno_dom@v0.1.41/src/constructor-lock.ts";
 
 export function createHTMLDocument() {
   return new DOMImplementation(CTOR_KEY)
     .createHTMLDocument() as unknown as Document;
+}
+
+export function parseDOM(source: string): Document {
+  let dom = new DOMParser().parseFromString(source, "text/html");
+  assert(dom != null, "null dom, not good");
+  return dom as unknown as Document;
 }
 
 declare global {

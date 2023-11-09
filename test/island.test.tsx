@@ -1,62 +1,125 @@
-import { assert, beforeEach, describe, expect, it } from "./suite.ts";
-import { island, IslandPath } from "../mod.ts";
-import { dirname } from "https://deno.land/std@0.205.0/path/dirname.ts";
-import { join } from "https://deno.land/std@0.205.0/path/join.ts";
+import type { Operation } from "../lib/deps/effection.ts";
+import type { Middleware } from "../mod.ts";
+
+import { assert, describe, expect, it, parseDOM } from "./suite.ts";
+import {
+  assertHTML,
+  createIslandMiddleware,
+  serializeHtml,
+} from "../lib/middleware.ts";
+
+import { createHandler, island } from "../mod.ts";
 
 describe("islands", () => {
-  beforeEach(function* (scope) {
-    let path = join(dirname(new URL(import.meta.url).pathname), "islands");
-    scope.set(IslandPath, path);
-  });
   describe("server", () => {
     it("renders a placeholder", function* () {
-      let html = (
-        <body>
-          {yield* island("hello.tsx")}
-        </body>
-      );
-      assert(html.type === "element");
+      let doc = yield* app(function* () {
+        return (
+          <html>
+            <body>
+              <main>
+                {yield* island("hello.tsx")}
+              </main>
+            </body>
+          </html>
+        );
+      });
 
-      expect(innerText(html)).toEqual("Hello World");
+      expect(doc.querySelector("main")?.innerText).toEqual("Hello World");
     });
 
     it("passes arguments to the placeholder", function* () {
-      let html = (
-        <section>
-          {yield* island("hello.tsx", { to: "Planet" })}
-        </section>
-      );
-      assert(html.type === "element");
+      let doc = yield* app(function* () {
+        return (
+          <html>
+            <body>
+              <main>
+                {yield* island("hello.tsx", { to: "Planet" })}
+              </main>
+            </body>
+          </html>
+        );
+      });
 
-      let element = select("section .hello", html);
-
-      assert(element && element.type === "element");
-
-      expect(innerText(element)).toEqual("Hello Planet");
+      expect(doc.querySelector("main")?.innerText).toEqual("Hello Planet");
     });
 
-    it("does not render anything if there is no placeholder provided");
+    it("does not render anything if there is no placeholder provided", function* () {
+      let doc = yield* app(function* () {
+        return (
+          <html>
+            <body>
+              <main>{yield* island("empty.tsx")}</main>
+            </body>
+          </html>
+        );
+      });
+
+      expect(doc.querySelector("main")?.innerText).toEqual("");
+    });
+
+    it("fails to render an island that does not exists", function* () {
+      try {
+        yield* app(function* () {
+          return (
+            <html>
+              <body>
+                {yield* island("no-such-island.tx")};
+              </body>
+            </html>
+          );
+        });
+        assert(false, "expected missing island to fail");
+      } catch (error) {
+        expect(error.name).toEqual("MissingIslandError");
+      }
+    });
+
     it("can render islands within islands");
   });
-  describe.ignore("client", () => {
-    it("runs the client operation");
-    it("passes the initial arguments to the client operation");
-    it("is ok if there is no client operation");
-    it("can handle events");
-    it("can render islands within islands");
-    it("can re-render a containing island");
+  describe("client", () => {
+    /* it("runs the client operation", function*() {
+     *   let document = yield* sendToClient(function*() {
+     *     return (
+     *       <html>
+     *         <body>
+     *           {yield* island("hello.tsx", { to: "Planet" })}
+     *         </body>
+     *       </html>);
+     *   });
+     *   expect(document.body.innerText).toEqual("Hello Planet, this is client.");
+     * }); */
+    /* it.ignore("is ok if there is no client operation");
+     * it.ignore("can handle events");
+     * it.ignore("can handle multiple islands in the same set of siblings");
+     * it.ignore("can render islands within islands");
+     * it.ignore("can re-render a containing island"); */
   });
 });
 
-import { toText } from "npm:hast-util-to-text@4.0.0";
-import { select as $select } from "npm:hast-util-select@6.0.1";
+import * as hello from "./islands/hello.tsx";
+import * as empty from "./islands/empty.tsx";
 
-function select(selector: string, element: JSX.Element): JSX.Element | null {
-  //@ts-expect-error it is ok
-  return $select(selector, element);
-}
+const collectIslands = createIslandMiddleware({
+  islandsDir: import.meta.resolve("./islands"),
+  modules: {
+    "hello.tsx": hello,
+    "empty.tsx": empty,
+  },
+});
 
-function innerText(element: JSX.Element): string {
-  //@ts-expect-error it's fine
-  return toText(element);
+function* app(
+  middleware: Middleware<Request, JSX.Element, never, never>,
+): Operation<Document> {
+  return yield* createHandler(
+    middleware,
+    assertHTML,
+    collectIslands,
+    serializeHtml,
+    function* (_: void, next) {
+      let response = yield* next(new Request("http://localhost/test.html"));
+      let text = yield* response.text();
+      return parseDOM(text);
+    },
+  )();
 }

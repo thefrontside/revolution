@@ -1,21 +1,12 @@
-import * as html from "https://deno.land/x/hastx@v0.0.8/html.ts";
+import * as html from "https://deno.land/x/hastx@v0.0.10/html.ts";
 import * as hast from "./lib/deps/hast.ts";
-import type { Operation } from "./lib/deps/effection.ts";
-import { render } from "./lib/render.ts";
-
-export type JSXChild = string | number | boolean | JSXElement;
-
-export type HASTElement = hast.Element;
-export type HASTFragment = hast.Root;
-export type HASTText = hast.Text;
-
-export type JSXElement =
-  & (hast.Element | hast.Root | hast.Text)
-  & Operation<Element | Node[] | Text>;
+import type { JSXChild, JSXElement } from "./lib/types.ts";
+export type * from "./lib/types.ts";
 
 export type JSXElementProps = Record<string, string> & {
   children?: JSXChild | JSXChild[];
 };
+
 export type JSXComponentProps = Record<string, unknown> & {
   key?: string;
 };
@@ -31,13 +22,13 @@ export interface JSXElementConstructor {
 
 declare global {
   export namespace JSX {
-    type Element = JSXElement;
-    type ElementType = keyof html.HTMLElements | JSXElementConstructor;
+    export type Element = JSXElement;
+    export type ElementType = keyof html.HTMLElements | JSXElementConstructor;
 
     //deno-lint-ignore no-empty-interface
-    interface IntrinsicElements extends html.HTMLElements {}
+    export interface IntrinsicElements extends html.HTMLElements {}
 
-    interface ElementChildrenAttribute {
+    export interface ElementChildrenAttribute {
       //deno-lint-ignore ban-types
       children: {};
     }
@@ -64,9 +55,6 @@ export function jsx(
       tagName,
       properties: { ...properties, ...className },
       children: read(children),
-      [Symbol.iterator]() {
-        return render(this)[Symbol.iterator]();
-      },
     };
   } else {
     return type({ ...props, ...(key ? { key } : {}) });
