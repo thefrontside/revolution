@@ -27,7 +27,7 @@ interface IslandInvocation {
 export function* useIsland(
   location: string,
   ...args: unknown[]
-): Operation<JSX.Element> {
+): Operation<JSXElement> {
   let collection = yield* CollectedIslands;
 
   let mod = collection.modules[location];

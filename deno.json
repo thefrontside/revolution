@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "test": "deno test --allow-read --allow-env --allow-run"
+    "test": "deno test --allow-read --allow-env --allow-run --allow-net"
   },
   "lint": {
     "rules": {

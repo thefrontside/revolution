@@ -24,10 +24,10 @@ export interface Slot {
   replace(...nodes: Node[]): void;
 }
 
-export interface Middleware<In, Out, NextIn = In, NextOut = Out> {
-  (request: In, next: Handler<NextIn, NextOut>): Operation<Out>;
-}
-
 export interface Handler<A, B> {
   (request: A): Operation<B>;
+}
+
+export interface Middleware<In, Out, NextIn = In, NextOut = Out> {
+  (request: In, next: Handler<NextIn, NextOut>): Operation<Out>;
 }
