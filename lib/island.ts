@@ -24,7 +24,7 @@ interface IslandInvocation {
   args: unknown[];
 }
 
-export function* island(
+export function* useIsland(
   location: string,
   ...args: unknown[]
 ): Operation<JSX.Element> {

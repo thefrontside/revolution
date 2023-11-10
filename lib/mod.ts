@@ -1,4 +1,4 @@
 export * from "./types.ts";
-export * from "./builder.ts";
-export * from "./island.ts";
+export * from "./middleware.ts";
 export * from "./handler.ts";
+export { useIsland } from "./island.ts";

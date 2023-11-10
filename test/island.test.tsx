@@ -8,7 +8,7 @@ import {
   serializeHtml,
 } from "../lib/middleware.ts";
 
-import { createHandler, island } from "../mod.ts";
+import { createHandler, useIsland } from "../mod.ts";
 
 describe("islands", () => {
   describe("server", () => {
@@ -18,7 +18,7 @@ describe("islands", () => {
           <html>
             <body>
               <main>
-                {yield* island("hello.tsx")}
+                {yield* useIsland("hello.tsx")}
               </main>
             </body>
           </html>
@@ -34,7 +34,7 @@ describe("islands", () => {
           <html>
             <body>
               <main>
-                {yield* island("hello.tsx", { to: "Planet" })}
+                {yield* useIsland("hello.tsx", { to: "Planet" })}
               </main>
             </body>
           </html>
@@ -49,7 +49,7 @@ describe("islands", () => {
         return (
           <html>
             <body>
-              <main>{yield* island("empty.tsx")}</main>
+              <main>{yield* useIsland("empty.tsx")}</main>
             </body>
           </html>
         );
@@ -64,7 +64,7 @@ describe("islands", () => {
           return (
             <html>
               <body>
-                {yield* island("no-such-island.tx")};
+                {yield* useIsland("no-such-island.tx")};
               </body>
             </html>
           );
