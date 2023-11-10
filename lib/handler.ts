@@ -25,6 +25,50 @@ export function createHandler<In, Out, A, B, C, D, E, F, G, H>(
   $4: Middleware<G, H, E, F>,
   $5: Middleware<In, Out, G, H>,
 ): Handler<In, Out>;
+export function createHandler<In, Out, A, B, C, D, E, F, G, H, I, J>(
+  $1: Middleware<A, B, never, never>,
+  $2: Middleware<C, D, A, B>,
+  $3: Middleware<E, F, C, D>,
+  $4: Middleware<G, H, E, F>,
+  $5: Middleware<I, J, G, H>,
+  $6: Middleware<In, Out, I, J>,
+): Handler<In, Out>;
+export function createHandler<In, Out, A, B, C, D, E, F, G, H, I, J, K, L>(
+  $1: Middleware<A, B, never, never>,
+  $2: Middleware<C, D, A, B>,
+  $3: Middleware<E, F, C, D>,
+  $4: Middleware<G, H, E, F>,
+  $5: Middleware<I, J, G, H>,
+  $6: Middleware<K, L, I, J>,
+  $7: Middleware<In, Out, K, L>,
+): Handler<In, Out>;
+export function createHandler<
+  In,
+  Out,
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+  H,
+  I,
+  J,
+  K,
+  L,
+  M,
+  N,
+>(
+  $1: Middleware<A, B, never, never>,
+  $2: Middleware<C, D, A, B>,
+  $3: Middleware<E, F, C, D>,
+  $4: Middleware<G, H, E, F>,
+  $5: Middleware<I, J, G, H>,
+  $6: Middleware<K, L, I, J>,
+  $7: Middleware<M, N, K, L>,
+  $8: Middleware<In, Out, M, N>,
+): Handler<In, Out>;
 export function createHandler<In, Out>(
   ...middlewares: [
     Middleware<In, Out, never, never>,
