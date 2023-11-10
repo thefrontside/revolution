@@ -38,7 +38,6 @@ describe("server", () => {
     });
 
     expect(port).toEqual(8999);
-
     expect(yield* response.text()).toEqual("Hello World");
   })
 })
