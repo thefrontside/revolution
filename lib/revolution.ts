@@ -6,14 +6,11 @@ import {
   httpResponsesMiddleware,
   respondNotFound,
   serializeHTMLMiddleware,
-  serveAssetsMiddleware,
 } from "./middleware.ts";
 
 import { type ServerInfo, useServer } from "./server.ts";
 
 import { createHandler } from "./handler.ts";
-
-import { join } from "https://deno.land/std@0.203.0/path/join.ts";
 
 export interface Revolution {
   start(options?: { port?: number }): Operation<ServerInfo>;
@@ -27,6 +24,7 @@ export interface RevolutionOptions {
 
 export function createRevolution(options: RevolutionOptions = {}): Revolution {
   let { jsx = [], html = [], http = [] } = options;
+
   //@ts-expect-error TODO how can we get this to work?
   let handler = createHandler(...[
     function* () {
@@ -37,10 +35,6 @@ export function createRevolution(options: RevolutionOptions = {}): Revolution {
     ...html,
     serializeHTMLMiddleware(),
     ...http,
-    serveAssetsMiddleware({
-      fsRoot: join(Deno.cwd(), "assets"),
-      urlRoot: "assets",
-    }),
     httpResponsesMiddleware(),
   ]);
 
