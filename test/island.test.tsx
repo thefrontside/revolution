@@ -5,7 +5,7 @@ import { assert, describe, expect, it, parseDOM } from "./suite.ts";
 import {
   assertHTML,
   createIslandMiddleware,
-  serializeHtml,
+  serializeHTMLMiddleware,
 } from "../lib/middleware.ts";
 
 import { createHandler, useIsland } from "../mod.ts";
@@ -115,7 +115,7 @@ function* app(
     middleware,
     assertHTML,
     collectIslands,
-    serializeHtml,
+    serializeHTMLMiddleware(),
     function* (_: void, next) {
       let response = yield* next(new Request("http://localhost/test.html"));
       let text = yield* response.text();
