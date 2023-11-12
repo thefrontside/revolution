@@ -30,7 +30,7 @@ export function httpResponsesMiddleware(): HTTPMiddleware {
         resolve(yield* next(request));
       });
     } catch (error) {
-      return new Response(error.toString(), {
+      return new Response(error.stack, {
         status: 500,
         statusText: "Internal Server Error",
       });
