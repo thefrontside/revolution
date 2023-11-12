@@ -1,13 +1,13 @@
 import { useAbortSignal } from "../lib/deps/effection.ts";
-import { describe, it, expect } from "./suite.ts";
+import { describe, expect, it } from "./suite.ts";
 import { useServer } from "../mod.ts";
 
 describe("server", () => {
-  it("can serve", function*() {
+  it("can serve", function* () {
     let server = yield* useServer({
       *handler(request) {
         return new Response(yield* request.text());
-      }
+      },
     });
 
     let signal = yield* useAbortSignal();
@@ -21,12 +21,12 @@ describe("server", () => {
     expect(yield* response.text()).toEqual("Hello World");
   });
 
-  it("can serve on a specific port", function*() {
+  it("can serve on a specific port", function* () {
     let { hostname, port } = yield* useServer({
       port: 8999,
       *handler(request) {
         return new Response(yield* request.text());
-      }
+      },
     });
 
     let signal = yield* useAbortSignal();
@@ -39,5 +39,5 @@ describe("server", () => {
 
     expect(port).toEqual(8999);
     expect(yield* response.text()).toEqual("Hello World");
-  })
-})
+  });
+});

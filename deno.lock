@@ -691,6 +691,7 @@
     "https://deno.land/x/hastx@v0.0.9/html.ts": "54f86c5378dd7282142c9847efaf20b7ee244743f16af20a62900e912d1ae810",
     "https://deno.land/x/importmap@0.2.1/_util.ts": "ada9a9618b537e6c0316c048a898352396c882b9f2de38aba18fd3f2950ede89",
     "https://deno.land/x/importmap@0.2.1/mod.ts": "ae3d1cd7eabd18c01a4960d57db471126b020f23b37ef14e1359bbb949227ade",
+    "https://deno.land/x/path_to_regexp@v6.2.1/index.ts": "894060567837bae8fc9c5cbd4d0a05e9024672083d5883b525c031eea940e556",
     "https://deno.land/x/plug@1.0.0-rc.3/deps.ts": "ea73ca429e71624fdae0fe9393fe5056b9404d058ef45688eda4150112cf85d3",
     "https://deno.land/x/plug@1.0.0-rc.3/download.ts": "81d1aef0595e018514f1d70a5c52b0267d81685e2dccb5459f8427b29f3f3736",
     "https://deno.land/x/plug@1.0.0-rc.3/mod.ts": "6db7edf982efedf8c9e1002754fbb109c22201fd8fb89ba715fe70171b5e821c",

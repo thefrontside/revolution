@@ -31,3 +31,9 @@ export interface Handler<A, B> {
 export interface Middleware<In, Out, NextIn = In, NextOut = Out> {
   (request: In, next: Handler<NextIn, NextOut>): Operation<Out>;
 }
+
+export type JSXMiddleware = Middleware<Request, JSXElement>;
+
+export type HTMLMiddleware = Middleware<Request, HASTHtmlNode>;
+
+export type HTTPMiddleware = Middleware<Request, Response>;

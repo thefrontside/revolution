@@ -9,7 +9,7 @@ export interface ServerInfo {
 }
 
 export interface ServerOptions {
-  port?: number,
+  port?: number;
   handler: Handler<Request, Response>;
 }
 
