@@ -3,7 +3,7 @@ import type { Middleware } from "../mod.ts";
 
 import { assert, describe, expect, it, parseDOM } from "./suite.ts";
 import {
-  assertHTML,
+  assertIsHtmlMiddleware,
   createIslandMiddleware,
   serializeHTMLMiddleware,
 } from "../lib/middleware.ts";
@@ -113,7 +113,7 @@ function* app(
 ): Operation<Document> {
   return yield* createHandler(
     middleware,
-    assertHTML,
+    assertIsHtmlMiddleware(),
     collectIslands,
     serializeHTMLMiddleware(),
     function* (_: void, next) {

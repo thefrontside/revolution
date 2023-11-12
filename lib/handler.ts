@@ -82,9 +82,3 @@ export function createHandler<In, Out>(
     throw new Error(`no next()`);
   });
 }
-
-export function createMiddleware<In, Out, NextIn = In, NextOut = Out>(
-  operation: Middleware<In, Out, NextIn, NextOut>,
-): Middleware<In, Out, NextIn, NextOut> {
-  return operation;
-}

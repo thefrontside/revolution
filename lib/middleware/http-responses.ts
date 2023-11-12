@@ -24,10 +24,16 @@ export function* respondNotFound(): Operation<never> {
 
 export function httpResponsesMiddleware(): HTTPMiddleware {
   return function* (request, next) {
-    let result = yield* action<Response>(function* (resolve) {
-      yield* ResponseContext.set(resolve);
-      resolve(yield* next(request));
-    });
-    return result;
+    try {
+      return yield* action<Response>(function* (resolve) {
+        yield* ResponseContext.set(resolve);
+        resolve(yield* next(request));
+      });
+    } catch (error) {
+      return new Response(error.toString(), {
+        status: 500,
+        statusText: "Internal Server Error",
+      });
+    }
   };
 }

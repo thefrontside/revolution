@@ -8,7 +8,7 @@ import {
 import { createContext, type Operation } from "./deps/effection.ts";
 
 const ParamsContext = createContext<MatchResult["params"]>(
-  "revoluption.params",
+  "revolution.params",
 );
 
 export function* useParams<T extends object>(): Operation<T> {

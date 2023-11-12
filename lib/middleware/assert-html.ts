@@ -2,9 +2,9 @@ import type { HASTHtmlNode, JSXElement, Middleware } from "../types.ts";
 
 export function assertIsHtmlMiddleware(): Middleware<
   Request,
-HASTHtmlNode,
-Request,
-JSXElement
+  HASTHtmlNode,
+  Request,
+  JSXElement
 > {
   return function* (req, next) {
     let node = yield* next(req);
