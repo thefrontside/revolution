@@ -1,42 +1,30 @@
 import type { Operation } from "./deps/effection.ts";
-import type { HTMLMiddleware, HTTPMiddleware, JSXMiddleware } from "./types.ts";
+import type { Handler, AppMiddleware, HTTPMiddleware, RevolutionPlugin } from "./types.ts";
 
+import { assertIsHTMLNode } from "./assertions.ts";
+import { serializeHtml } from "./middleware/serialize-html.ts";
 import {
-  assertIsHtmlMiddleware,
-  httpResponsesMiddleware,
+  concat,
+  dispatch,
   respondNotFound,
-  serializeHTMLMiddleware,
+  httpResponsesMiddleware,
 } from "./middleware.ts";
 
 import { type ServerInfo, useServer } from "./server.ts";
-
-import { createHandler } from "./handler.ts";
 
 export interface Revolution {
   start(options?: { port?: number }): Operation<ServerInfo>;
 }
 
 export interface RevolutionOptions {
-  jsx?: JSXMiddleware[];
-  html?: HTMLMiddleware[];
-  http?: HTTPMiddleware[];
+  app?: AppMiddleware[];
+  plugins?: RevolutionPlugin[];
 }
 
 export function createRevolution(options: RevolutionOptions = {}): Revolution {
-  let { jsx = [], html = [], http = [] } = options;
+  let { app = [], plugins = []} = options;
 
-  //@ts-expect-error TODO how can we get this to work?
-  let handler = createHandler(...[
-    function* () {
-      return yield* respondNotFound();
-    },
-    ...jsx,
-    assertIsHtmlMiddleware(),
-    ...html,
-    serializeHTMLMiddleware(),
-    ...http,
-    httpResponsesMiddleware(),
-  ]);
+  let handler = createApp(app, plugins);
 
   return {
     *start({ port } = {}) {
@@ -44,4 +32,29 @@ export function createRevolution(options: RevolutionOptions = {}): Revolution {
       return server;
     },
   };
+}
+
+function createApp(middlewares: AppMiddleware[], plugins: RevolutionPlugin[]): Handler<Request, Response> {
+
+  let html = concat(...plugins.flatMap((plugin) => [plugin.html ?? []].flat()));
+
+  let http = concat(...plugins.flatMap((plugin) => [plugin.http ?? []].flat()));
+
+  let app = concat(...middlewares.map<HTTPMiddleware>(middleware => {
+    return function*(request, next) {
+      //@ts-expect-error the JSX Element is always mapped into Response
+      const result = yield* middleware(request, next);
+      if (result instanceof Response) {
+        return result;
+      } else {
+        assertIsHTMLNode(result);
+        let element = yield* html(request, function*() { return result });
+        return serializeHtml(element)
+      }
+    }
+  }));
+
+  let handler = concat(httpResponsesMiddleware(), http, app);
+
+  return dispatch(handler, respondNotFound);
 }

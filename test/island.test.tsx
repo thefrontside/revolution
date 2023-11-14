@@ -1,14 +1,12 @@
 import type { Operation } from "../lib/deps/effection.ts";
-import type { Middleware } from "../mod.ts";
+import type { Handler } from "../mod.ts";
 
 import { assert, describe, expect, it, parseDOM } from "./suite.ts";
-import {
-  assertIsHtmlMiddleware,
-  createIslandMiddleware,
-  serializeHTMLMiddleware,
-} from "../lib/middleware.ts";
+import { createIslandMiddleware } from "../lib/middleware.ts";
+import { assertIsHTMLNode } from "../lib/assertions.ts";
+import { serializeHtml } from "../lib/middleware/serialize-html.ts";
 
-import { createHandler, useIsland } from "../mod.ts";
+import { useIsland } from "../mod.ts";
 
 describe("islands", () => {
   describe("server", () => {
@@ -108,18 +106,15 @@ const collectIslands = createIslandMiddleware({
   },
 });
 
-function* app(
-  middleware: Middleware<Request, JSX.Element, never, never>,
-): Operation<Document> {
-  return yield* createHandler(
-    middleware,
-    assertIsHtmlMiddleware(),
-    collectIslands,
-    serializeHTMLMiddleware(),
-    function* (_: void, next) {
-      let response = yield* next(new Request("http://localhost/test.html"));
-      let text = yield* response.text();
-      return parseDOM(text);
-    },
-  )();
+function* app(handler: Handler<Request, JSX.Element>): Operation<Document> {
+  let request = new Request("http://localhost/test.html")
+  let html = yield* collectIslands(request, function*() {
+    let element = yield* handler(request);
+    assertIsHTMLNode(element);
+    return element;
+  });
+
+  let text = yield* serializeHtml(html).text();
+
+  return parseDOM(text);
 }

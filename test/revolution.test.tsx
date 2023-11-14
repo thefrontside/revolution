@@ -1,7 +1,7 @@
 import { useAbortSignal } from "../lib/deps/effection.ts";
 
 import { describe, expect, it } from "./suite.ts";
-import { createRevolution, HASTElement } from "../mod.ts";
+import { createRevolution, type HASTElement } from "../mod.ts";
 
 describe("revolution", () => {
   it("responds with 404 when nothing specified", function* () {
@@ -17,7 +17,7 @@ describe("revolution", () => {
 
   it("serves JSX", function* () {
     let revolution = createRevolution({
-      jsx: [
+      app: [
         function* () {
           return (
             <html>
@@ -40,7 +40,7 @@ describe("revolution", () => {
 
   it("complains if the JSX returned is not an HTML element", function* () {
     let revolution = createRevolution({
-      jsx: [
+      app: [
         function* () {
           return <body>Hello World</body>;
         },
@@ -57,7 +57,7 @@ describe("revolution", () => {
 
   it("transforms HTML trees", function* () {
     let revolution = createRevolution({
-      jsx: [
+      app: [
         function* () {
           return (
             <html>
@@ -66,15 +66,17 @@ describe("revolution", () => {
           );
         },
       ],
-      html: [
-        function* (request, next) {
-          let html = yield* next(request);
-          let [body] = html.children;
-          (body as HASTElement).children.unshift(
-            <div>Banner</div> as HASTElement,
-          );
-          return html;
-        },
+      plugins: [
+        {
+          *html(request, next) {
+            let node = yield* next(request);
+            let [body] = node.children;
+            (body as HASTElement).children.unshift(
+              <div>Banner</div> as HASTElement,
+            );
+            return node;
+          }
+        }
       ],
     });
     let { hostname, port } = yield* revolution.start({ port: 8999 });

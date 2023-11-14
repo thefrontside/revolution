@@ -23,7 +23,7 @@ export function* respondNotFound(): Operation<never> {
 }
 
 export function httpResponsesMiddleware(): HTTPMiddleware {
-  return function* (request, next) {
+  return function* httpResponses(request, next): Operation<Response> {
     try {
       return yield* action<Response>(function* (resolve) {
         yield* ResponseContext.set(resolve);
