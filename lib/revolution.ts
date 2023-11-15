@@ -1,13 +1,18 @@
 import type { Operation } from "./deps/effection.ts";
-import type { Handler, AppMiddleware, HTTPMiddleware, RevolutionPlugin } from "./types.ts";
+import type {
+  AppMiddleware,
+  Handler,
+  HTTPMiddleware,
+  RevolutionPlugin,
+} from "./types.ts";
 
 import { assertIsHTMLNode } from "./assertions.ts";
 import { serializeHtml } from "./middleware/serialize-html.ts";
 import {
   concat,
   dispatch,
-  respondNotFound,
   httpResponsesMiddleware,
+  respondNotFound,
 } from "./middleware.ts";
 
 import { type ServerInfo, useServer } from "./server.ts";
@@ -22,7 +27,7 @@ export interface RevolutionOptions {
 }
 
 export function createRevolution(options: RevolutionOptions = {}): Revolution {
-  let { app = [], plugins = []} = options;
+  let { app = [], plugins = [] } = options;
 
   let handler = createApp(app, plugins);
 
@@ -34,24 +39,28 @@ export function createRevolution(options: RevolutionOptions = {}): Revolution {
   };
 }
 
-function createApp(middlewares: AppMiddleware[], plugins: RevolutionPlugin[]): Handler<Request, Response> {
-
+function createApp(
+  middlewares: AppMiddleware[],
+  plugins: RevolutionPlugin[],
+): Handler<Request, Response> {
   let html = concat(...plugins.flatMap((plugin) => [plugin.html ?? []].flat()));
 
   let http = concat(...plugins.flatMap((plugin) => [plugin.http ?? []].flat()));
 
-  let app = concat(...middlewares.map<HTTPMiddleware>(middleware => {
-    return function*(request, next) {
+  let app = concat(...middlewares.map<HTTPMiddleware>((middleware) => {
+    return function* (request, next) {
       //@ts-expect-error the JSX Element is always mapped into Response
       const result = yield* middleware(request, next);
       if (result instanceof Response) {
         return result;
       } else {
         assertIsHTMLNode(result);
-        let element = yield* html(request, function*() { return result });
-        return serializeHtml(element)
+        let element = yield* html(request, function* () {
+          return result;
+        });
+        return serializeHtml(element);
       }
-    }
+    };
   }));
 
   let handler = concat(httpResponsesMiddleware(), http, app);

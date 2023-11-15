@@ -1,7 +1,8 @@
-import type { JSXElement, HASTHtmlNode } from "./types.ts"
+import type { HASTHtmlNode, JSXElement } from "./types.ts";
 
-export function assertIsHTMLNode(node: JSXElement): asserts node is HASTHtmlNode {
-
+export function assertIsHTMLNode(
+  node: JSXElement,
+): asserts node is HASTHtmlNode {
   if (node.type !== "element") {
     throw new Error(
       `expected an <html> element, but was non-element node of type: '${node.type}'`,

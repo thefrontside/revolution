@@ -7,7 +7,7 @@ import {
   type Scope,
   suspend,
 } from "../lib/deps/effection.ts";
-import { assert } from "https://deno.land/std@0.205.0/assert/mod.ts";
+import { assert } from "../lib/deps/std.ts";
 export { assert };
 export { expect } from "https://deno.land/x/expect@v0.2.9/mod.ts";
 export { expectType } from "npm:ts-expect";

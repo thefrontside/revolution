@@ -75,8 +75,8 @@ describe("revolution", () => {
               <div>Banner</div> as HASTElement,
             );
             return node;
-          }
-        }
+          },
+        },
       ],
     });
     let { hostname, port } = yield* revolution.start({ port: 8999 });

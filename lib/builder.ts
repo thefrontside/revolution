@@ -1,8 +1,7 @@
 import { call, type Operation } from "./deps/effection.ts";
-
+import { join } from "./deps/std.ts";
 import * as esbuild from "https://deno.land/x/esbuild@v0.19.5/mod.js";
 import { denoPlugins } from "https://deno.land/x/esbuild_deno_loader@0.8.2/mod.ts";
-import { join } from "https://deno.land/std@0.205.0/path/posix/join.ts";
 import type { BuildResult } from "https://deno.land/x/esbuild@v0.19.5/mod.js";
 
 import { IslandCollection } from "./island.ts";

@@ -1,9 +1,5 @@
 import { describe, expect, it } from "../suite.ts";
-import {
-  concat,
-  httpResponsesMiddleware,
-  respondNotFound,
-} from "../../mod.ts";
+import { concat, httpResponsesMiddleware, respondNotFound } from "../../mod.ts";
 
 describe("http responses middleware", () => {
   it("can short circuit a middleware stack with a 404", function* () {

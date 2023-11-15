@@ -107,8 +107,8 @@ const collectIslands = createIslandMiddleware({
 });
 
 function* app(handler: Handler<Request, JSX.Element>): Operation<Document> {
-  let request = new Request("http://localhost/test.html")
-  let html = yield* collectIslands(request, function*() {
+  let request = new Request("http://localhost/test.html");
+  let html = yield* collectIslands(request, function* () {
     let element = yield* handler(request);
     assertIsHTMLNode(element);
     return element;
