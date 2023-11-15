@@ -21,13 +21,12 @@ export interface IslandCollection {
 interface IslandInvocation {
   id: string;
   location: string;
-  args: unknown[];
+  props: Record<string, unknown>;
 }
 
-export function* useIsland(
+export function* useIsland<T extends Record<string, unknown>>(
   location: string,
-  ...args: unknown[]
-): Operation<JSXElement> {
+): Operation<(props: T) => JSXElement> {
   let collection = yield* CollectedIslands;
 
   let mod = collection.modules[location];
@@ -37,40 +36,42 @@ export function* useIsland(
     throw error;
   }
 
-  let id = String(collection.nextId++);
-  collection.seen.add(location);
-  collection.invocations[id] = { id, location, args };
-  let { placeholder } = mod;
+  return (props: T) => {
+    let id = String(collection.nextId++);
+    collection.seen.add(location);
+    collection.invocations[id] = { id, location, props };
+    let { placeholder } = mod;
 
-  let slot: HASTFragment = {
-    type: "root",
-    children: [
-      {
-        type: "comment",
-        value: `island@${id}`,
-      },
-    ],
-  };
+    let slot: HASTFragment = {
+      type: "root",
+      children: [
+        {
+          type: "comment",
+          value: `island@${id}`,
+        },
+      ],
+    };
 
-  if (placeholder) {
-    if (typeof placeholder === "string") {
-      slot.children.push({
-        type: "text",
-        value: placeholder,
-      });
-    } else if (typeof placeholder === "function") {
-      let content = placeholder(...args);
-      if (content.type === "root") {
-        slot.children.push(...content.children);
-      } else {
-        slot.children.push(content);
+    if (placeholder) {
+      if (typeof placeholder === "string") {
+        slot.children.push({
+          type: "text",
+          value: placeholder,
+        });
+      } else if (typeof placeholder === "function") {
+        let content = placeholder(props);
+        if (content.type === "root") {
+          slot.children.push(...content.children);
+        } else {
+          slot.children.push(content);
+        }
       }
     }
-  }
-  slot.children.push({
-    type: "comment",
-    value: `/island@${id}`,
-  });
+    slot.children.push({
+      type: "comment",
+      value: `/island@${id}`,
+    });
 
-  return slot;
+    return slot;
+  }
 }

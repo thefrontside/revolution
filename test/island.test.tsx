@@ -1,5 +1,5 @@
 import type { Operation } from "../lib/deps/effection.ts";
-import type { Handler } from "../mod.ts";
+import type { Handler, JSXElement } from "../mod.ts";
 
 import { assert, describe, expect, it, parseDOM } from "./suite.ts";
 import { createIslandMiddleware } from "../lib/middleware.ts";
@@ -12,11 +12,12 @@ describe("islands", () => {
   describe("server", () => {
     it("renders a placeholder", function* () {
       let doc = yield* app(function* () {
+        let Hello = yield* useIsland<{to?: string}>("hello.tsx");
         return (
           <html>
             <body>
               <main>
-                {yield* useIsland("hello.tsx")}
+                <Hello/>
               </main>
             </body>
           </html>
@@ -28,11 +29,12 @@ describe("islands", () => {
 
     it("passes arguments to the placeholder", function* () {
       let doc = yield* app(function* () {
+        let Hello = yield* useIsland<{to: string}>("hello.tsx");
         return (
           <html>
             <body>
               <main>
-                {yield* useIsland("hello.tsx", { to: "Planet" })}
+                <Hello to="Planet"/>
               </main>
             </body>
           </html>
@@ -44,10 +46,11 @@ describe("islands", () => {
 
     it("does not render anything if there is no placeholder provided", function* () {
       let doc = yield* app(function* () {
+        let Empty = yield* useIsland("empty.tsx");
         return (
           <html>
             <body>
-              <main>{yield* useIsland("empty.tsx")}</main>
+              <main><Empty/></main>
             </body>
           </html>
         );
@@ -59,11 +62,10 @@ describe("islands", () => {
     it("fails to render an island that does not exists", function* () {
       try {
         yield* app(function* () {
+          let NoSuchIsland = yield* useIsland("no-such-island.tx");
           return (
             <html>
-              <body>
-                {yield* useIsland("no-such-island.tx")};
-              </body>
+              <body><NoSuchIsland/></body>
             </html>
           );
         });
@@ -106,7 +108,7 @@ const collectIslands = createIslandMiddleware({
   },
 });
 
-function* app(handler: Handler<Request, JSX.Element>): Operation<Document> {
+function* app(handler: Handler<Request, JSXElement>): Operation<Document> {
   let request = new Request("http://localhost/test.html");
   let html = yield* collectIslands(request, function* () {
     let element = yield* handler(request);
