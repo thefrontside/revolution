@@ -2,11 +2,9 @@ import type { Operation } from "../lib/deps/effection.ts";
 import type { Handler, JSXElement } from "../mod.ts";
 
 import { assert, describe, expect, it, parseDOM } from "./suite.ts";
-import { createIslandMiddleware } from "../lib/middleware.ts";
-import { assertIsHTMLNode } from "../lib/assertions.ts";
-import { serializeHtml } from "../lib/middleware/serialize-html.ts";
-
-import { useIsland } from "../mod.ts";
+import { islandPlugin } from "../lib/middleware.ts";
+import { useObjectURL } from "../lib/object-url.ts";
+import { useIsland, createRevolution } from "../mod.ts";
 
 describe("islands", () => {
   describe("server", () => {
@@ -60,35 +58,46 @@ describe("islands", () => {
     });
 
     it("fails to render an island that does not exists", function* () {
-      try {
-        yield* app(function* () {
-          let NoSuchIsland = yield* useIsland("no-such-island.tx");
-          return (
-            <html>
-              <body><NoSuchIsland/></body>
-            </html>
-          );
-        });
-        assert(false, "expected missing island to fail");
-      } catch (error) {
-        expect(error.name).toEqual("MissingIslandError");
-      }
+      let doc = yield* app(function* () {
+        let NoSuchIsland = yield* useIsland("no-such-island.tx");
+        console.dir({ NoSuchIsland });
+        return (
+          <html>
+            <body><NoSuchIsland/></body>
+          </html>
+        );
+      });
+
+      expect(doc.documentElement?.innerText).toContain("MissingIslandError");
+
     });
 
     it("can render islands within islands");
   });
   describe("client", () => {
-    /* it("runs the client operation", function*() {
-     *   let document = yield* sendToClient(function*() {
-     *     return (
-     *       <html>
-     *         <body>
-     *           {yield* island("hello.tsx", { to: "Planet" })}
-     *         </body>
-     *       </html>);
-     *   });
-     *   expect(document.body.innerText).toEqual("Hello Planet, this is client.");
-     * }); */
+    it.ignore("runs the client operation", function*() {
+      let document = yield* app(function*() {
+        let Hello = yield* useIsland<{ to: string }>("hello.tsx");
+        return (
+          <html>
+            <body>
+              <main><Hello to="Planet"/></main>
+            </body>
+          </html>
+        );
+      });
+      let script = document.querySelector("script[type='module']");
+      assert(!!script, "island entry point was not defined");
+      let url = yield* useObjectURL(new Blob([script.innerHTML]));
+
+      let { bootstrap } = yield* import(url);
+
+      console.log(document.createNodeIterator);
+
+      yield* bootstrap(document);
+
+      expect(document.body.querySelector("main")?.innerText).toEqual("Hello Planet, this is client.");
+    });
     /* it.ignore("is ok if there is no client operation");
      * it.ignore("can handle events");
      * it.ignore("can handle multiple islands in the same set of siblings");
@@ -100,7 +109,7 @@ describe("islands", () => {
 import * as hello from "./islands/hello.tsx";
 import * as empty from "./islands/empty.tsx";
 
-const collectIslands = createIslandMiddleware({
+const islands = islandPlugin({
   islandsDir: import.meta.resolve("./islands"),
   modules: {
     "hello.tsx": hello,
@@ -108,15 +117,18 @@ const collectIslands = createIslandMiddleware({
   },
 });
 
+
 function* app(handler: Handler<Request, JSXElement>): Operation<Document> {
-  let request = new Request("http://localhost/test.html");
-  let html = yield* collectIslands(request, function* () {
-    let element = yield* handler(request);
-    assertIsHTMLNode(element);
-    return element;
+  const revolution = createRevolution({
+    app: [handler],
+    plugins: [islands]
   });
 
-  let text = yield* serializeHtml(html).text();
+  let request = new Request("http://localhost/test.html");
+  let response = yield* revolution.handler(request);
+
+
+  let text = yield* response.text();
 
   return parseDOM(text);
 }

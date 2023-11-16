@@ -78,6 +78,10 @@ it.only = function only(desc: string, op?: () => Operation<void>): void {
   }
 };
 
+it.ignore = function ignore(desc: string, op?: () => Operation<void>): void {
+  return bdd.it.ignore(desc, () => { op } );
+}
+
 import { DOMImplementation } from "https://deno.land/x/deno_dom@v0.1.41/deno-dom-wasm.ts";
 import { CTOR_KEY } from "https://deno.land/x/deno_dom@v0.1.41/src/constructor-lock.ts";
 

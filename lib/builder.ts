@@ -29,14 +29,14 @@ export function* buildIslandBootstrap(
     let name = seen[i];
     bootstrap.push(
       `import * as $${i} from "${join(islandsDir, name)}";`,
-      `modules.set(${name}, $${i})`,
+      `modules.set("${name}", $${i})`,
     );
   }
 
   bootstrap.push(
     "\n",
     `import { main } from "${mainPath}";`,
-    `export const bootstrap = (dom) => main(dom, islands, modules);`,
+    `export const bootstrap = (document) => main({ document, islands, modules });`,
     `if (typeof globalThis.document !== "undefined") { await bootstrap(document); }`,
   );
 

@@ -18,13 +18,13 @@ export interface IslandCollection {
   modules: Record<string, IslandModule>;
 }
 
-interface IslandInvocation {
+export interface IslandInvocation {
   id: string;
   location: string;
   props: Record<string, unknown>;
 }
 
-export function* useIsland<T extends Record<string, unknown>>(
+export function* useIsland<T extends Record<string, unknown> = Record<string, never>>(
   location: string,
 ): Operation<(props: T) => JSXElement> {
   let collection = yield* CollectedIslands;

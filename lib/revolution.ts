@@ -18,6 +18,7 @@ import {
 import { type ServerInfo, useServer } from "./server.ts";
 
 export interface Revolution {
+  handler: Handler<Request, Response>;
   start(options?: { port?: number }): Operation<ServerInfo>;
 }
 
@@ -32,6 +33,7 @@ export function createRevolution(options: RevolutionOptions = {}): Revolution {
   let handler = createApp(app, plugins);
 
   return {
+    handler,
     *start({ port } = {}) {
       let server = yield* useServer({ handler, port });
       return server;

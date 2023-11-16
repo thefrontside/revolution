@@ -2,50 +2,51 @@ import type {
   HASTElement,
   HASTHtmlNode,
   HASTScriptNode,
-  Middleware,
+  RevolutionPlugin,
 } from "../types.ts";
 import { CollectedIslands, type IslandModule } from "../island.ts";
 import { buildIslandBootstrap } from "../builder.ts";
 
-export interface IslandMiddlewareOptions {
+export interface IslandPluginOptions {
   islandsDir: string;
   modules: Record<string, IslandModule>;
 }
 
-export function createIslandMiddleware(
-  options: IslandMiddlewareOptions,
-): Middleware<Request, HASTHtmlNode> {
+export function islandPlugin(options: IslandPluginOptions): RevolutionPlugin {
   let { islandsDir, modules } = options;
-  return function* collectIslands(request, next) {
-    let collection = yield* CollectedIslands.set({
-      nextId: 0,
-      seen: new Set(),
-      modules,
-      invocations: {},
-    });
+  return {
+    *http(request, next) {
+      yield* CollectedIslands.set({
+        nextId: 0,
+        seen: new Set(),
+        modules,
+        invocations: {},
+      });
+      return yield* next(request);
+    },
+    *html(request, next) {
+      let html = yield* next(request);
+      let collection = yield* CollectedIslands;
+      let bytes = yield* buildIslandBootstrap({
+        collection,
+        islandsDir,
+      });
+      let value = new TextDecoder().decode(bytes);
 
-    let html = yield* next(request);
+      let script = {
+        type: "element",
+        tagName: "script",
+        properties: {
+          "type": "module",
+        },
+        children: [{
+          type: "text",
+          value,
+        }],
+      } satisfies HASTScriptNode;
 
-    let bytes = yield* buildIslandBootstrap({
-      collection,
-      islandsDir,
-    });
-
-    let value = new TextDecoder().decode(bytes);
-
-    let script = {
-      type: "element",
-      tagName: "script",
-      properties: {
-        "type": "module",
-      },
-      children: [{
-        type: "text",
-        value,
-      }],
-    } satisfies HASTScriptNode;
-
-    return appendToBody(html, script);
+      return appendToBody(html, script);
+    }
   };
 }
 
