@@ -4,18 +4,18 @@ import type { Handler, JSXElement } from "../mod.ts";
 import { assert, describe, expect, it, parseDOM } from "./suite.ts";
 import { islandPlugin } from "../lib/middleware.ts";
 import { useObjectURL } from "../lib/object-url.ts";
-import { useIsland, createRevolution } from "../mod.ts";
+import { createRevolution, useIsland } from "../mod.ts";
 
 describe("islands", () => {
   describe("server", () => {
     it("renders a placeholder", function* () {
       let doc = yield* app(function* () {
-        let Hello = yield* useIsland<{to?: string}>("hello.tsx");
+        let Hello = yield* useIsland<{ to?: string }>("hello.tsx");
         return (
           <html>
             <body>
               <main>
-                <Hello/>
+                <Hello />
               </main>
             </body>
           </html>
@@ -27,12 +27,12 @@ describe("islands", () => {
 
     it("passes arguments to the placeholder", function* () {
       let doc = yield* app(function* () {
-        let Hello = yield* useIsland<{to: string}>("hello.tsx");
+        let Hello = yield* useIsland<{ to: string }>("hello.tsx");
         return (
           <html>
             <body>
               <main>
-                <Hello to="Planet"/>
+                <Hello to="Planet" />
               </main>
             </body>
           </html>
@@ -48,7 +48,9 @@ describe("islands", () => {
         return (
           <html>
             <body>
-              <main><Empty/></main>
+              <main>
+                <Empty />
+              </main>
             </body>
           </html>
         );
@@ -60,28 +62,30 @@ describe("islands", () => {
     it("fails to render an island that does not exists", function* () {
       let doc = yield* app(function* () {
         let NoSuchIsland = yield* useIsland("no-such-island.tx");
-        console.dir({ NoSuchIsland });
         return (
           <html>
-            <body><NoSuchIsland/></body>
+            <body>
+              <NoSuchIsland />
+            </body>
           </html>
         );
       });
 
       expect(doc.documentElement?.innerText).toContain("MissingIslandError");
-
     });
 
     it("can render islands within islands");
   });
   describe("client", () => {
-    it.ignore("runs the client operation", function*() {
-      let document = yield* app(function*() {
+    it.ignore("runs the client operation", function* () {
+      let document = yield* app(function* () {
         let Hello = yield* useIsland<{ to: string }>("hello.tsx");
         return (
           <html>
             <body>
-              <main><Hello to="Planet"/></main>
+              <main>
+                <Hello to="Planet" />
+              </main>
             </body>
           </html>
         );
@@ -96,13 +100,10 @@ describe("islands", () => {
 
       yield* bootstrap(document);
 
-      expect(document.body.querySelector("main")?.innerText).toEqual("Hello Planet, this is client.");
+      expect(document.body.querySelector("main")?.innerText).toEqual(
+        "Hello Planet, this is client.",
+      );
     });
-    /* it.ignore("is ok if there is no client operation");
-     * it.ignore("can handle events");
-     * it.ignore("can handle multiple islands in the same set of siblings");
-     * it.ignore("can render islands within islands");
-     * it.ignore("can re-render a containing island"); */
   });
 });
 
@@ -117,16 +118,14 @@ const islands = islandPlugin({
   },
 });
 
-
 function* app(handler: Handler<Request, JSXElement>): Operation<Document> {
   const revolution = createRevolution({
     app: [handler],
-    plugins: [islands]
+    plugins: [islands],
   });
 
   let request = new Request("http://localhost/test.html");
   let response = yield* revolution.handler(request);
-
 
   let text = yield* response.text();
 

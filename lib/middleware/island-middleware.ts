@@ -46,7 +46,7 @@ export function islandPlugin(options: IslandPluginOptions): RevolutionPlugin {
       } satisfies HASTScriptNode;
 
       return appendToBody(html, script);
-    }
+    },
   };
 }
 

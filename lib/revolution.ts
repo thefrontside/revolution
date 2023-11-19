@@ -18,19 +18,19 @@ import {
 import { type ServerInfo, useServer } from "./server.ts";
 
 export interface Revolution {
-  handler: Handler<Request, Response>;
+  handler(request: Request): Operation<Response>;
   start(options?: { port?: number }): Operation<ServerInfo>;
 }
 
 export interface RevolutionOptions {
-  app?: AppMiddleware[];
+  app?: AppMiddleware | AppMiddleware[];
   plugins?: RevolutionPlugin[];
 }
 
 export function createRevolution(options: RevolutionOptions = {}): Revolution {
   let { app = [], plugins = [] } = options;
 
-  let handler = createApp(app, plugins);
+  let handler = createApp(typeof app === "function" ? [app] : app, plugins);
 
   return {
     handler,

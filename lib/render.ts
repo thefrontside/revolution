@@ -40,13 +40,14 @@ function toNodes(ast: ASTNode, doc: Document): Node[] {
     for (let [key, value] of Object.entries(ast.properties ?? {})) {
       //@ts-expect-error it will be fine;
       element[key] = value;
-      for (let child of ast.children) {
-        if (child.type === "comment") {
-          element.appendChild(doc.createComment(child.value));
-        } else {
-          let childNodes = toNodes(child, doc);
-          element.append(...childNodes);
-        }
+    }
+
+    for (let child of ast.children) {
+      if (child.type === "comment") {
+        element.appendChild(doc.createComment(child.value));
+      } else {
+        let childNodes = toNodes(child, doc);
+        element.append(...childNodes);
       }
     }
     return [element];

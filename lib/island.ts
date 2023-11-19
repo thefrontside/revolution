@@ -6,9 +6,11 @@ export const CollectedIslands = createContext<IslandCollection>(
   "revolution.IslandCollection",
 );
 
-export interface IslandModule<TArgs extends unknown[] = unknown[]> {
-  default?(...args: TArgs): Operation<void>;
-  placeholder?(...args: TArgs): JSXElement;
+export interface IslandModule<
+  TProps extends Record<string, unknown> = Record<string, unknown>,
+> {
+  default?(props: TProps): Operation<void>;
+  placeholder?(props: TProps): JSXElement;
 }
 
 export interface IslandCollection {
@@ -24,7 +26,9 @@ export interface IslandInvocation {
   props: Record<string, unknown>;
 }
 
-export function* useIsland<T extends Record<string, unknown> = Record<string, never>>(
+export function* useIsland<
+  T extends Record<string, unknown> = Record<string, never>,
+>(
   location: string,
 ): Operation<(props: T) => JSXElement> {
   let collection = yield* CollectedIslands;
@@ -73,5 +77,5 @@ export function* useIsland<T extends Record<string, unknown> = Record<string, ne
     });
 
     return slot;
-  }
+  };
 }
