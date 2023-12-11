@@ -43,7 +43,8 @@ export function* buildIslandBootstrap(
   try {
     let result = yield* call<BuildResult>(esbuild.build({
       plugins: [...denoPlugins({
-        configPath: new URL("../deno.json", import.meta.url).pathname,
+        configPath: join(Deno.cwd(), "deno.json"),
+        nodeModulesDir: true,
       })],
       stdin: {
         contents: bootstrap.join("\n"),

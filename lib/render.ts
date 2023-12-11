@@ -1,8 +1,13 @@
-import type { JSXElement, Slot } from "./types.ts";
+import type { JSXElement } from "./types.ts";
 import { createContext, type Operation } from "./deps/effection.ts";
 
-export const CurrentSlot = createContext<Slot>("slot");
+import { h, init, propsModule, attributesModule, toVNode, type VNode, type Attrs, type VNodeChildElement } from "npm:snabbdom@3.5.1";
+
+export const CurrentSlot = createContext<HTMLSlotElement>("slot");
 export const CurrentDocument = createContext<Document>("document");
+const CurrentVNode = createContext<VNode>("vnode");
+
+const patch = init([propsModule, attributesModule]);
 
 export function* useDocument() {
   return yield* CurrentDocument;
@@ -13,43 +18,52 @@ type ASTNode = JSXElement;
 export function render(jsx: JSXElement): Operation<void> {
   return {
     *[Symbol.iterator]() {
-      let doc = yield* CurrentDocument;
-      let nodes = toNodes(jsx, doc);
       let slot = yield* CurrentSlot;
-      slot.replace(...nodes);
+      let current = yield* CurrentVNode.get();
+
+      if (!current) {
+        current = yield* CurrentVNode.set(toVNode(slot));
+      }
+
+      let vnode = h("slot", { attrs: { name: slot.name } }, toVNodes(jsx));
+      patch(toVNode(slot), vnode);
     },
   };
 }
 
-function toNodes(ast: ASTNode, doc: Document): Node[] {
+function toVNodes(ast: ASTNode): VNodeChildElement[] {
   if (ast.type === "text") {
-    return [doc.createTextNode(ast.value)];
+    return [String(ast.value)];
   } else if (ast.type === "root") {
     let { children } = ast;
     return children.flatMap((child) => {
       if (child.type === "doctype") {
         return [];
       } else if (child.type === "comment") {
-        return [doc.createComment(child.value)];
+        return [h("!", {}, child.value)];
       } else {
-        return toNodes(child, doc);
+        return toVNodes(child);
       }
     });
   } else {
-    let element = doc.createElement(ast.tagName);
+    let attrs = {} as Attrs;
+    let props = {} as Record<string, unknown>;
     for (let [key, value] of Object.entries(ast.properties ?? {})) {
-      //@ts-expect-error it will be fine;
-      element[key] = value;
-    }
-
-    for (let child of ast.children) {
-      if (child.type === "comment") {
-        element.appendChild(doc.createComment(child.value));
+      if (key.startsWith("on") || !(typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')) {
+        props[key] = value;
       } else {
-        let childNodes = toNodes(child, doc);
-        element.append(...childNodes);
+        attrs[key] = value;
       }
     }
-    return [element];
+
+    let children: VNodeChildElement[] = [];
+    for (let child of ast.children) {
+      if (child.type === "comment") {
+        children.push(h("!", {}, child.value));
+      } else {
+        children.push(...toVNodes(child));
+      }
+    }
+    return [h(ast.tagName, { attrs, props }, children)];
   }
 }

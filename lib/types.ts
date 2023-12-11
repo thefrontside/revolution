@@ -20,10 +20,6 @@ export interface HASTScriptNode extends HASTElement {
 
 export type JSXElement = HASTElement | HASTFragment | HASTText;
 
-export interface Slot {
-  replace(...nodes: Node[]): void;
-}
-
 export interface Handler<A, B> {
   (request: A): Operation<B>;
 }

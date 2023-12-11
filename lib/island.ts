@@ -1,4 +1,4 @@
-import type { HASTFragment, JSXElement } from "./types.ts";
+import type { HASTElement, JSXElement } from "./types.ts";
 
 import { createContext, type Operation } from "./deps/effection.ts";
 
@@ -46,14 +46,13 @@ export function* useIsland<
     collection.invocations[id] = { id, location, props };
     let { placeholder } = mod;
 
-    let slot: HASTFragment = {
-      type: "root",
-      children: [
-        {
-          type: "comment",
-          value: `island@${id}`,
-        },
-      ],
+    let slot: HASTElement = {
+      type: "element",
+      tagName: "slot",
+      properties: {
+        name: `island@${id}`,
+      },
+      children: [],
     };
 
     if (placeholder) {
@@ -65,16 +64,16 @@ export function* useIsland<
       } else if (typeof placeholder === "function") {
         let content = placeholder(props);
         if (content.type === "root") {
-          slot.children.push(...content.children);
+          for (let child of content.children) {
+            if (child.type !== "doctype") {
+              slot.children.push(child);
+            }
+          }
         } else {
           slot.children.push(content);
         }
       }
     }
-    slot.children.push({
-      type: "comment",
-      value: `/island@${id}`,
-    });
 
     return slot;
   };
