@@ -2,10 +2,10 @@ import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.42/deno-dom-wasm.ts
 import * as bdd from "https://deno.land/std@0.163.0/testing/bdd.ts";
 import {
   createScope,
-  expect,
   type Operation,
   type Scope,
   suspend,
+  call,
 } from "../lib/deps/effection.ts";
 import { assert } from "../lib/deps/std.ts";
 export { assert };
@@ -99,6 +99,6 @@ declare global {
 
 Object.defineProperty(Promise.prototype, Symbol.iterator, {
   get<T>(this: Promise<T>) {
-    return expect(this)[Symbol.iterator];
+    return call(this)[Symbol.iterator];
   },
 });
