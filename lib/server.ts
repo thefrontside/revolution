@@ -20,6 +20,8 @@ export interface ServerOptions {
   handler: Handler<Request, Response>;
 }
 
+export const _driver = Symbol.for("revolution.driver");
+
 export function useServer(options: ServerOptions): Operation<ServerInfo> {
   return resource(function* (provide) {
     let scope = yield* useScope();
@@ -27,8 +29,29 @@ export function useServer(options: ServerOptions): Operation<ServerInfo> {
     let server: Deno.HttpServer;
 
     let handler = (request: Request) =>
-      scope.run(() => {
-        return race([aborted(request), options.handler(request)]);
+      scope.run(function* () {
+        let response = yield* race([
+          aborted(request),
+          options.handler(request),
+        ]);
+
+        //@ts-expect-error it's ok
+        const driver: () => Operation<void> = response[_driver];
+
+        if (driver) {
+          scope.run(function* () {
+            try {
+              yield* race([aborted(request), driver()]);
+            } catch (error) {
+              // See https://github.com/denoland/deno/issues/10829
+              if (error !== "resource closed") {
+                throw error;
+              }
+            }
+          });
+        }
+
+        return response;
       });
 
     let info = yield* action<ServerInfo>(
@@ -53,6 +76,23 @@ export function useServer(options: ServerOptions): Operation<ServerInfo> {
 // this satisfies the async/await API which must return an Repsonse
 // because async functions cannot be discarded.
 function* aborted(request: Request): Operation<Response> {
-  yield* once(request.signal, "aborted");
-  return new Response();
+  if (request.signal.aborted) {
+    return responseAborted();
+  } else {
+    yield* once(request.signal, "abort");
+    return responseAborted();
+  }
+}
+
+export function drive(response: Response, op: () => Operation<void>): Response {
+  return Object.create(response, {
+    [_driver]: {
+      enumerable: false,
+      value: op,
+    },
+  });
+}
+
+function responseAborted(): Response {
+  return new Response("aborted");
 }

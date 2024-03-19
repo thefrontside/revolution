@@ -1,11 +1,11 @@
 import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.42/deno-dom-wasm.ts";
 import * as bdd from "https://deno.land/std@0.163.0/testing/bdd.ts";
 import {
+  call,
   createScope,
   type Operation,
   type Scope,
   suspend,
-  call,
 } from "../lib/deps/effection.ts";
 import { assert } from "../lib/deps/std.ts";
 export { assert };

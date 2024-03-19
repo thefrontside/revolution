@@ -5,6 +5,7 @@ import { useServer } from "../mod.ts";
 describe("server", () => {
   it("can serve", function* () {
     let server = yield* useServer({
+      port: 8901,
       *handler(request) {
         return new Response(yield* request.text());
       },
@@ -23,7 +24,7 @@ describe("server", () => {
 
   it("can serve on a specific port", function* () {
     let { hostname, port } = yield* useServer({
-      port: 8999,
+      port: 8900,
       *handler(request) {
         return new Response(yield* request.text());
       },
@@ -31,13 +32,13 @@ describe("server", () => {
 
     let signal = yield* useAbortSignal();
 
-    let response = yield* fetch(`http://${hostname}:8999`, {
+    let response = yield* fetch(`http://${hostname}:8900`, {
       method: "POST",
       body: "Hello World",
       signal,
     });
 
-    expect(port).toEqual(8999);
+    expect(port).toEqual(8900);
     expect(yield* response.text()).toEqual("Hello World");
   });
 });
