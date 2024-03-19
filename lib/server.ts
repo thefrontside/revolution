@@ -9,6 +9,7 @@ import {
   resource,
   useScope,
 } from "./deps/effection.ts";
+import { getframe } from "./deps/effection.ts";
 
 export interface ServerInfo {
   hostname: string;
@@ -20,6 +21,10 @@ export interface ServerOptions {
   handler: Handler<Request, Response>;
 }
 
+interface Driver {
+  operation(): Operation<void>;
+  context: Record<string, unknown>;
+}
 export const _driver = Symbol.for("revolution.driver");
 
 export function useServer(options: ServerOptions): Operation<ServerInfo> {
@@ -35,13 +40,16 @@ export function useServer(options: ServerOptions): Operation<ServerInfo> {
           options.handler(request),
         ]);
 
-        //@ts-expect-error it's ok
-        const driver: () => Operation<void> = response[_driver];
+        //@ts-expect-error it's either there or it's not.
+        const driver: Driver = response[_driver];
 
         if (driver) {
           scope.run(function* () {
+            let frame = yield* getframe();
+            Object.assign(frame.context, driver.context);
+
             try {
-              yield* race([aborted(request), driver()]);
+              yield* race([aborted(request), driver.operation()]);
             } catch (error) {
               // See https://github.com/denoland/deno/issues/10829
               if (error !== "resource closed") {
@@ -84,11 +92,15 @@ function* aborted(request: Request): Operation<Response> {
   }
 }
 
-export function drive(response: Response, op: () => Operation<void>): Response {
+export function* drive(
+  response: Response,
+  operation: () => Operation<void>,
+): Operation<Response> {
+  let { context } = yield* getframe();
   return Object.create(response, {
     [_driver]: {
       enumerable: false,
-      value: op,
+      value: { context, operation },
     },
   });
 }
