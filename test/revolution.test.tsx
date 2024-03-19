@@ -27,11 +27,12 @@ describe("revolution", () => {
         },
       ],
     });
-    let { hostname, port } = yield* revolution.start({ port: 8999 });
+    let { hostname, port } = yield* revolution.start({ port: 8997 });
 
     let signal = yield* useAbortSignal();
 
     let response = yield* fetch(`http://${hostname}:${port}`, { signal });
+
     expect(response.status).toEqual(200);
     expect(yield* response.text()).toEqual(
       "<html><body>Hello World</body></html>",
@@ -46,7 +47,7 @@ describe("revolution", () => {
         },
       ],
     });
-    let { hostname, port } = yield* revolution.start({ port: 8999 });
+    let { hostname, port } = yield* revolution.start({ port: 8998 });
 
     let signal = yield* useAbortSignal();
 
