@@ -1,7 +1,8 @@
 import { describe, expect, it } from "./suite.ts";
-import { createRevolution, sse } from "../mod.ts";
+import { createRevolution, route, sse, useParams } from "../mod.ts";
 import { call, sleep, suspend } from "../lib/deps/effection.ts";
 import { spawn } from "../lib/deps/effection.ts";
+import { useAbortSignal } from "https://deno.land/x/effection@3.0.3/mod.ts";
 
 describe("streaming responses", () => {
   it("can consume an SSE stream", function* () {
@@ -59,5 +60,30 @@ data:blastoff!
       yield* sleep(2);
       ac.abort();
     });
+  });
+
+  it("preserves context between the original operation and the stream driver", function* () {
+    let revolution = createRevolution({
+      app: [
+        route(
+          "/:foo/:bar",
+          sse(function* () {
+            return {
+              event: "return",
+              data: JSON.stringify(yield* useParams()),
+            };
+          }),
+        ),
+      ],
+    });
+    let { hostname, port } = yield* revolution.start({ port: 9992 });
+    let response = yield* fetch(`http://${hostname}:${port}/x/y`, {
+      signal: yield* useAbortSignal(),
+    });
+
+    let text = yield* response.text();
+
+    expect(text).toEqual(`event:return
+data:{"foo":"x","bar":"y"}\n\n`);
   });
 });

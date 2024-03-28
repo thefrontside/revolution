@@ -27,7 +27,7 @@ export function sse<
       },
     });
 
-    return drive(response, function* () {
+    return yield* drive(response, function* () {
       let events = createChannel<T, TDone>();
       yield* spawn(function* () {
         let writer = body.writable.getWriter();
