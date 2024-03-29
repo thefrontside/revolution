@@ -15,9 +15,12 @@ export function sse<
   T extends ServerSentEventMessage,
   TDone extends ServerSentEventMessage,
 >(
-  op: (send: (value: T) => Operation<void>) => Operation<TDone>,
+  op: (
+    request: Request,
+    send: (value: T) => Operation<void>,
+  ) => Operation<TDone>,
 ): Middleware<Request, Response> {
-  return function* () {
+  return function* (request: Request, _next) {
     let body = new ServerSentEventStream();
 
     let response = new Response(body.readable, {
@@ -44,7 +47,7 @@ export function sse<
         }
       });
 
-      let result = yield* op(events.send);
+      let result = yield* op(request, events.send);
       yield* events.close(result);
     });
   };
