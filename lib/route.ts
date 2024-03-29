@@ -6,6 +6,7 @@ import {
 } from "https://deno.land/x/path_to_regexp@v6.2.1/index.ts";
 
 import { createContext, type Operation } from "./deps/effection.ts";
+import { concat } from "./middleware.ts";
 
 const ParamsContext = createContext<MatchResult["params"]>("revolution.params");
 
@@ -52,14 +53,7 @@ export function route<T>(
   path: string,
   ...middlewares: Middleware<Request, T>[]
 ): Middleware<Request, T> {
-  const inlinedMiddleware = middlewares.slice(1).reduce(
-    (inlined, current) => {
-      return function* (request, next) {
-        return yield* inlined(request, (request) => current(request, next));
-      };
-    },
-    middlewares[0],
-  );
+  const inlinedMiddleware = concat(...middlewares);
   return function* (request, next) {
     let pathname = new URL(request.url).pathname;
     let result = match(path)(pathname);
