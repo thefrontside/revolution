@@ -1,4 +1,4 @@
-import type { Handler, Middleware } from "./types.ts";
+import type { Middleware } from "./types.ts";
 
 import {
   match,
@@ -16,35 +16,43 @@ export function* useParams<T extends object>(): Operation<T> {
 
 function buildMethodRoute<T>(
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
-  handler: Handler<Request, T>,
+  handler: Middleware<Request, T>,
 ): Middleware<Request, T> {
   return function* (request, next) {
     if (request.method === method) {
-      return yield* handler(request);
+      return yield* handler(request, next);
     } else {
       return yield* next(request);
     }
   };
 }
 
-export function GET<T>(handler: Handler<Request, T>): Middleware<Request, T> {
+export function GET<T>(
+  handler: Middleware<Request, T>,
+): Middleware<Request, T> {
   return buildMethodRoute("GET", handler);
 }
 
-export function POST<T>(handler: Handler<Request, T>): Middleware<Request, T> {
+export function POST<T>(
+  handler: Middleware<Request, T>,
+): Middleware<Request, T> {
   return buildMethodRoute("POST", handler);
 }
 
-export function PUT<T>(handler: Handler<Request, T>): Middleware<Request, T> {
+export function PUT<T>(
+  handler: Middleware<Request, T>,
+): Middleware<Request, T> {
   return buildMethodRoute("PUT", handler);
 }
 
-export function PATCH<T>(handler: Handler<Request, T>): Middleware<Request, T> {
+export function PATCH<T>(
+  handler: Middleware<Request, T>,
+): Middleware<Request, T> {
   return buildMethodRoute("PATCH", handler);
 }
 
 export function DELETE<T>(
-  handler: Handler<Request, T>,
+  handler: Middleware<Request, T>,
 ): Middleware<Request, T> {
   return buildMethodRoute("DELETE", handler);
 }
