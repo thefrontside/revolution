@@ -8,7 +8,7 @@ describe("streaming responses", () => {
   it("can consume an SSE stream", function* () {
     let revolution = createRevolution({
       app: [
-        sse(function* (send) {
+        sse(function* ({ send }) {
           for (let i = 3; i > 0; i--) {
             yield* send({ event: "count", data: JSON.stringify(i) });
             yield* sleep(5);
