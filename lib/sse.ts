@@ -11,13 +11,18 @@ import {
 import { Middleware } from "./types.ts";
 import { drive } from "./server.ts";
 
+export interface SSEDriverOptions<T extends ServerSentEventMessage> {
+  request: Request;
+  send(value: T): Operation<void>;
+}
+
 export function sse<
   T extends ServerSentEventMessage,
   TDone extends ServerSentEventMessage,
 >(
-  op: (send: (value: T) => Operation<void>) => Operation<TDone>,
+  op: (options: SSEDriverOptions<T>) => Operation<TDone>,
 ): Middleware<Request, Response> {
-  return function* () {
+  return function* (request: Request) {
     let body = new ServerSentEventStream();
 
     let response = new Response(body.readable, {
@@ -43,8 +48,7 @@ export function sse<
           yield* close(writer);
         }
       });
-
-      let result = yield* op(events.send);
+      let result = yield* op({ request, send: events.send });
       yield* events.close(result);
     });
   };
