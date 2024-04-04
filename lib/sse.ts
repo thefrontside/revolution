@@ -5,6 +5,7 @@ import {
 import {
   call,
   createChannel,
+  each,
   type Operation,
   spawn,
 } from "./deps/effection.ts";
@@ -33,23 +34,25 @@ export function sse<
     });
 
     return yield* drive(response, function* () {
-      let events = createChannel<T, TDone>();
-      yield* spawn(function* () {
-        let writer = body.writable.getWriter();
-        try {
-          let subscription = yield* events;
-          let next = yield* subscription.next();
-          while (!next.done) {
-            yield* call(() => writer.write(next.value));
-            next = yield* subscription.next();
+      let writer = body.writable.getWriter();
+      let events = createChannel<T, never>();
+      try {
+        yield* spawn(function* () {
+          for (const event of yield* each(events)) {
+            yield* call(() => writer.write(event));
+            yield* each.next();
           }
-          yield* call(() => writer.write(next.value));
-        } finally {
-          yield* close(writer);
-        }
-      });
-      let result = yield* op({ request, send: events.send });
-      yield* events.close(result);
+          console.log("no more next. write final value");
+        });
+        let result = yield* op({ request, send: events.send });
+        console.log("result returned from handler");
+        yield* call(() => writer.write(result));
+        console.log("wrote result to stream");
+      } finally {
+        console.log("closing writer");
+        yield* close(writer);
+        console.log("channel closed");
+      }
     });
   };
 }
