@@ -152,7 +152,7 @@ describe("revolution", () => {
 
     expect(response.status).toEqual(200);
     expect(yield* response.text()).toEqual(
-      "<html><body>Hello World</body></html>",
+      "<!doctype html><html><body>Hello World</body></html>",
     );
   });
 
@@ -204,7 +204,7 @@ describe("revolution", () => {
     let response = yield* fetch(`http://${hostname}:${port}`, { signal });
 
     expect(yield* response.text()).toEqual(
-      "<html><body><div>Banner</div>Hello World</body></html>",
+      "<!doctype html><html><body><div>Banner</div>Hello World</body></html>",
     );
   });
 });
