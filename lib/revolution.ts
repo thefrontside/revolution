@@ -1,4 +1,4 @@
-import type { Operation } from "./deps/effection.ts";
+import { createContext, type Operation } from "./deps/effection.ts";
 import type {
   AppMiddleware,
   Handler,
@@ -27,9 +27,7 @@ export interface RevolutionOptions {
 }
 
 export function createRevolution(options: RevolutionOptions = {}): Revolution {
-  let { app = [], plugins = [] } = options;
-
-  let handler = createApp(app, plugins);
+  let handler = createApp(options);
 
   return {
     *start({ port } = {}) {
@@ -39,10 +37,17 @@ export function createRevolution(options: RevolutionOptions = {}): Revolution {
   };
 }
 
-function createApp(
-  middlewares: AppMiddleware[],
-  plugins: RevolutionPlugin[],
-): Handler<Request, Response> {
+const RevolutionOptions = createContext<RevolutionOptions>(
+  "revolution.options",
+);
+export function* useRevolutionOptions(): Operation<RevolutionOptions> {
+  return yield* RevolutionOptions;
+}
+
+function createApp({
+  app: middlewares = [],
+  plugins = [],
+}: RevolutionOptions): Handler<Request, Response> {
   let html = concat(...plugins.flatMap((plugin) => [plugin.html ?? []].flat()));
 
   let http = concat(...plugins.flatMap((plugin) => [plugin.http ?? []].flat()));
@@ -63,7 +68,12 @@ function createApp(
     };
   }));
 
-  let handler = concat(httpResponsesMiddleware(), http, app);
+  let options: HTTPMiddleware = function* revolutionOptions(request, next) {
+    yield* RevolutionOptions.set({ app: middlewares, plugins });
+    return yield* next(request);
+  };
+
+  let handler = concat(options, httpResponsesMiddleware(), http, app);
 
   return dispatch(handler, respondNotFound);
 }
