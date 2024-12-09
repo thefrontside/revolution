@@ -22,6 +22,21 @@ export function* respondNotFound(): Operation<never> {
   throw new Error("This code is unreachable, but TypeScript don't know.");
 }
 
+export interface RedirectOptions {
+  permanent?: boolean;
+}
+
+export function* respondRedirect(
+  url: string | URL,
+  options: RedirectOptions = {},
+): Operation<never> {
+  let status = options.permanent ? 308 : 307;
+  let respond = yield* ResponseContext;
+  respond(Response.redirect(url, status));
+  yield* suspend();
+  throw new Error("This code is unreachable, but TypeScript don't know.");
+}
+
 export function httpResponsesMiddleware(): HTTPMiddleware {
   return function* httpResponses(request, next): Operation<Response> {
     try {
