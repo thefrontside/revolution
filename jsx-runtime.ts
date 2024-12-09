@@ -25,6 +25,7 @@ declare global {
     export type Element = JSXElement;
     export type ElementType = keyof html.HTMLElements | JSXElementConstructor;
 
+    //deno-lint-ignore no-empty-interface
     export interface IntrinsicElements extends html.HTMLElements {}
 
     export interface ElementChildrenAttribute {

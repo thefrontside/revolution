@@ -69,7 +69,7 @@ describe("islands", () => {
         });
         assert(false, "expected missing island to fail");
       } catch (error) {
-        expect((error as Error).name).toEqual("MissingIslandError");
+        expect(error.name).toEqual("MissingIslandError");
       }
     });
 

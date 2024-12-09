@@ -55,7 +55,7 @@ export function beforeEach(op: (scope: Scope) => Operation<void>): void {
           resolve();
           yield* suspend();
         } catch (e) {
-          error = e as Error;
+          error = e;
         }
       });
     });
@@ -93,6 +93,7 @@ export function parseDOM(source: string): Document {
 }
 
 declare global {
+  // deno-lint-ignore no-empty-interface
   interface Promise<T> extends Operation<T> {}
 }
 
