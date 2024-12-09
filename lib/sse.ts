@@ -62,7 +62,7 @@ function* close(writer: WritableStreamDefaultWriter): Operation<void> {
   try {
     yield* call(() => writer.close());
   } catch (error) {
-    if (!error?.message?.match(/stream is closed/)) {
+    if (!(error as Error)?.message?.match(/stream is closed/)) {
       throw error;
     }
   }
