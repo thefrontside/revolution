@@ -8,8 +8,8 @@ import {
   each,
   type Operation,
   spawn,
-} from "./deps/effection.ts";
-import { Middleware } from "./types.ts";
+} from "effection";
+import type { Middleware } from "./types.ts";
 import { drive } from "./server.ts";
 
 export interface SSEDriverOptions<T extends ServerSentEventMessage> {

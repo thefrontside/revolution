@@ -5,13 +5,13 @@ import {
   type MatchResult,
 } from "https://deno.land/x/path_to_regexp@v6.2.1/index.ts";
 
-import { createContext, type Operation } from "./deps/effection.ts";
+import { createContext, type Operation } from "effection";
 import { concat } from "./middleware.ts";
 
 const ParamsContext = createContext<MatchResult["params"]>("revolution.params");
 
 export function* useParams<T extends object>(): Operation<T> {
-  return (yield* ParamsContext) as T;
+  return (yield* ParamsContext.expect()) as T;
 }
 
 function buildMethodRoute<T>(

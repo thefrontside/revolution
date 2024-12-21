@@ -1,6 +1,6 @@
 import { describe, expect, it } from "./suite.ts";
 import { GET, respondNotFound, route, useParams } from "../mod.ts";
-import type { Operation } from "../lib/deps/effection.ts";
+import type { Operation } from "effection";
 
 describe("route", () => {
   it("makes the params available", function* () {

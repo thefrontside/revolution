@@ -1,4 +1,4 @@
-import { useAbortSignal } from "../lib/deps/effection.ts";
+import { useAbortSignal } from "effection";
 import { describe, expect, it } from "./suite.ts";
 import { useServer } from "../mod.ts";
 

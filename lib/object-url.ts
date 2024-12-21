@@ -1,4 +1,4 @@
-import { type Operation, resource } from "./deps/effection.ts";
+import { type Operation, resource } from "effection";
 
 export function useObjectURL(
   object: File | Blob | MediaSource,

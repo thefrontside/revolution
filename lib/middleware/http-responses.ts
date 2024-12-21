@@ -5,14 +5,14 @@ import {
   createContext,
   type Operation,
   suspend,
-} from "../deps/effection.ts";
+} from "effection";
 
 const ResponseContext = createContext<(response: Response) => void>(
   "revolutions.httpResponse",
 );
 
 export function* respondNotFound(): Operation<never> {
-  let respond = yield* ResponseContext;
+  let respond = yield* ResponseContext.expect();
   let response = new Response("Not Found", {
     status: 404,
     statusText: "Not Found",
@@ -31,7 +31,7 @@ export function* respondRedirect(
   options: RedirectOptions = {},
 ): Operation<never> {
   let status = options.permanent ? 308 : 307;
-  let respond = yield* ResponseContext;
+  let respond = yield* ResponseContext.expect();
   respond(Response.redirect(url, status));
   yield* suspend();
   throw new Error("This code is unreachable, but TypeScript don't know.");

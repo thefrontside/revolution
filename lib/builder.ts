@@ -1,8 +1,8 @@
+import { join } from "@std/path";
+import { call, type Operation } from "effection";
+import type { BuildResult } from "esbuild";
+import * as esbuild from "esbuild";
 import { denoPlugins } from "jsr:@luca/esbuild-deno-loader@0.11.1";
-import type { BuildResult } from "npm:esbuild@0.19.5";
-import * as esbuild from "npm:esbuild@0.19.5";
-import { call, type Operation } from "./deps/effection.ts";
-import { join } from "./deps/std.ts";
 
 import type { IslandCollection } from "./island.ts";
 
