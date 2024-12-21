@@ -1,4 +1,4 @@
-import { createContext, type Operation, type Context } from "effection";
+import { type Context, createContext, type Operation } from "effection";
 import type {
   AppMiddleware,
   Handler,
@@ -37,7 +37,9 @@ export function createRevolution(options: RevolutionOptions = {}): Revolution {
   };
 }
 
-const RevolutionOptions: Context<RevolutionOptions> = createContext<RevolutionOptions>(
+const RevolutionOptions: Context<RevolutionOptions> = createContext<
+  RevolutionOptions
+>(
   "revolution.options",
 );
 

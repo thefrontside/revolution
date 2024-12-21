@@ -1,11 +1,6 @@
 import type { HTTPMiddleware } from "../types.ts";
 
-import {
-  action,
-  createContext,
-  type Operation,
-  suspend,
-} from "effection";
+import { action, createContext, type Operation, suspend } from "effection";
 
 const ResponseContext = createContext<(response: Response) => void>(
   "revolutions.httpResponse",

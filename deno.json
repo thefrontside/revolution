@@ -2,6 +2,12 @@
   "name": "@frontside/revolution",
   "version": "0.6.1",
   "exports": "./mod.ts",
+  "license": "ISC",
+  "publish": {
+    "exclude": [
+      "test"
+    ]
+  },
   "tasks": {
     "test": "deno test --allow-read --allow-write --allow-env --allow-run --allow-net"
   },
@@ -24,6 +30,7 @@
     "@std/http": "jsr:@std/http@1.0.12",
     "hast": "npm:@types/hast@^3.0.0",
     "@std/testing": "jsr:@std/testing@1.0.8",
-    "revolution/jsx-runtime": "./jsx-runtime.ts"
+    "revolution/jsx-runtime": "./jsx-runtime.ts",
+    "path-to-regexp": "npm:path-to-regexp@8.2.0"
   }
 }

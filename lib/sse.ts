@@ -1,14 +1,5 @@
-import {
-  type ServerSentEventMessage,
-  ServerSentEventStream,
-} from "jsr:@std/http";
-import {
-  call,
-  createChannel,
-  each,
-  type Operation,
-  spawn,
-} from "effection";
+import { type ServerSentEventMessage, ServerSentEventStream } from "@std/http";
+import { call, createChannel, each, type Operation, spawn } from "effection";
 import type { Middleware } from "./types.ts";
 import { drive } from "./server.ts";
 

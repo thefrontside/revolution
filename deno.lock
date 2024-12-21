@@ -37,6 +37,7 @@
     "npm:hast-util-select@6.0.1": "6.0.1",
     "npm:hast-util-to-html@9.0.0": "9.0.0",
     "npm:hast-util-to-text@4.0.0": "4.0.0",
+    "npm:path-to-regexp@8.2.0": "8.2.0",
     "npm:ts-expect@*": "1.3.0"
   },
   "jsr": {
@@ -520,6 +521,9 @@
       "dependencies": [
         "entities"
       ]
+    },
+    "path-to-regexp@8.2.0": {
+      "integrity": "sha512-TdrF7fW9Rphjq4RjrW0Kp2AW0Ahwu9sRGTkS6bvDi0SCwZlEZYmcfDbEsTz8RVk0EHIS/Vd1bv3JhG+1xZuAyQ=="
     },
     "property-information@6.4.0": {
       "integrity": "sha512-9t5qARVofg2xQqKtytzt+lZ4d1Qvj8t5B8fEwXK6qOfgRLgH/b13QlgEyDh033NOS31nXeFbYv7CLUDG1CeifQ=="
