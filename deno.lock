@@ -1098,7 +1098,8 @@
       "jsr:@std/path@1.0.8",
       "jsr:@std/testing@1.0.8",
       "npm:@types/hast@3",
-      "npm:esbuild@0.24.2"
+      "npm:esbuild@0.24.2",
+      "npm:path-to-regexp@8.2.0"
     ]
   }
 }
