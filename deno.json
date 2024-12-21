@@ -1,6 +1,5 @@
 {
   "name": "@frontside/revolution",
-  "version": "0.6.1",
   "exports": "./mod.ts",
   "license": "ISC",
   "publish": {
@@ -9,7 +8,9 @@
     ]
   },
   "tasks": {
-    "test": "deno test --allow-read --allow-write --allow-env --allow-run --allow-net"
+    "test": "deno test --allow-read --allow-write --allow-env --allow-run --allow-net",
+    "build:npm": "deno run -A tasks/build-npm.ts",
+    "build:jsr": "deno run -A tasks/build-jsr.ts"
   },
   "lint": {
     "rules": {
