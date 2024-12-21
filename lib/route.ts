@@ -6,7 +6,9 @@ import { createContext, type Operation } from "effection";
 import { concat } from "./middleware.ts";
 import type { ParamData } from "path-to-regexp";
 
-const ParamsContext = createContext<MatchResult<ParamData>["params"]>("revolution.params");
+const ParamsContext = createContext<MatchResult<ParamData>["params"]>(
+  "revolution.params",
+);
 
 export function* useParams<T extends object>(): Operation<T> {
   return (yield* ParamsContext.expect()) as T;
