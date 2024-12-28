@@ -1,6 +1,6 @@
 import type { HTTPMiddleware } from "../types.ts";
-import { call } from "../deps/effection.ts";
-import { serveDir as server, type ServeDirOptions } from "../deps/std.ts";
+import { call } from "effection";
+import { serveDir as server, type ServeDirOptions } from "@std/http";
 
 export function serveDirMiddleware(
   options?: ServeDirOptions,

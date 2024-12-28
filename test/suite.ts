@@ -1,13 +1,13 @@
-import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.42/deno-dom-wasm.ts";
-import * as bdd from "https://deno.land/std@0.163.0/testing/bdd.ts";
+import { DOMParser } from "deno-dom";
+import * as bdd from "@std/testing/bdd";
 import {
   call,
   createScope,
   type Operation,
   type Scope,
   suspend,
-} from "../lib/deps/effection.ts";
-import { assert } from "../lib/deps/std.ts";
+} from "effection";
+import { assert } from "@std/assert";
 export { assert };
 export { expect } from "https://deno.land/x/expect@v0.2.9/mod.ts";
 export { expectType } from "npm:ts-expect";
@@ -43,6 +43,7 @@ function describeWithScope<T>(...args: bdd.DescribeArgs<T>): bdd.TestSuite<T> {
 
 describeWithScope.only = bdd.describe.only;
 describeWithScope.ignore = bdd.describe.ignore;
+describeWithScope.skip = bdd.describe.skip;
 
 export const describe: typeof bdd.describe = describeWithScope;
 

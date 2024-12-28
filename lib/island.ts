@@ -1,6 +1,6 @@
 import type { HASTFragment, JSXElement } from "./types.ts";
 
-import { createContext, type Operation } from "./deps/effection.ts";
+import { createContext, type Operation } from "effection";
 
 export const CollectedIslands = createContext<IslandCollection>(
   "revolution.IslandCollection",
@@ -28,7 +28,7 @@ export function* useIsland(
   location: string,
   ...args: unknown[]
 ): Operation<JSXElement> {
-  let collection = yield* CollectedIslands;
+  let collection = yield* CollectedIslands.expect();
 
   let mod = collection.modules[location];
   if (!mod) {

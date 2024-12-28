@@ -1,5 +1,5 @@
-import type { Operation } from "./deps/effection.ts";
-import * as hast from "./deps/hast.ts";
+import type { Operation } from "effection";
+import type * as hast from "hast";
 
 export type JSXChild = string | number | boolean | JSXElement;
 export type HASTElement = hast.Element;

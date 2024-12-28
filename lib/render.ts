@@ -1,5 +1,5 @@
 import type { JSXElement, Slot } from "./types.ts";
-import { createContext, type Operation } from "./deps/effection.ts";
+import { createContext, type Operation } from "effection";
 
 export const CurrentSlot = createContext<Slot>("slot");
 export const CurrentDocument = createContext<Document>("document");

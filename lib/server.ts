@@ -1,15 +1,8 @@
-import type { Operation } from "./deps/effection.ts";
+import type { Operation } from "effection";
 import type { Handler } from "./types.ts";
 
-import {
-  action,
-  call,
-  once,
-  race,
-  resource,
-  useScope,
-} from "./deps/effection.ts";
-import { getframe } from "./deps/effection.ts";
+import { action, call, once, race, resource, useScope } from "effection";
+import { getframe } from "effection";
 
 export interface ServerInfo {
   hostname: string;

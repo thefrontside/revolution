@@ -1,4 +1,4 @@
-import type { Operation } from "../lib/deps/effection.ts";
+import type { Operation } from "effection";
 import type { Handler } from "../mod.ts";
 
 import { assert, describe, expect, it, parseDOM } from "./suite.ts";

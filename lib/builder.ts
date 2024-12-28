@@ -1,10 +1,10 @@
-import { call, type Operation } from "./deps/effection.ts";
-import { join } from "./deps/std.ts";
-import * as esbuild from "https://deno.land/x/esbuild@v0.19.5/mod.js";
-import { denoPlugins } from "https://deno.land/x/esbuild_deno_loader@0.8.2/mod.ts";
-import type { BuildResult } from "https://deno.land/x/esbuild@v0.19.5/mod.js";
+import { join } from "@std/path";
+import { call, type Operation } from "effection";
+import type { BuildResult } from "esbuild";
+import * as esbuild from "esbuild";
+import { denoPlugins } from "jsr:@luca/esbuild-deno-loader@0.11.1";
 
-import { IslandCollection } from "./island.ts";
+import type { IslandCollection } from "./island.ts";
 
 export interface BuildIslandBootrapOptions {
   collection: IslandCollection;

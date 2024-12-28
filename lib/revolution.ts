@@ -1,4 +1,4 @@
-import { createContext, type Operation } from "./deps/effection.ts";
+import { type Context, createContext, type Operation } from "effection";
 import type {
   AppMiddleware,
   Handler,
@@ -37,9 +37,12 @@ export function createRevolution(options: RevolutionOptions = {}): Revolution {
   };
 }
 
-const RevolutionOptions = createContext<RevolutionOptions>(
+const RevolutionOptions: Context<RevolutionOptions> = createContext<
+  RevolutionOptions
+>(
   "revolution.options",
 );
+
 export function* useRevolutionOptions(): Operation<RevolutionOptions> {
   return yield* RevolutionOptions;
 }

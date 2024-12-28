@@ -1,17 +1,17 @@
 import type { Middleware } from "./types.ts";
 
-import {
-  match,
-  type MatchResult,
-} from "https://deno.land/x/path_to_regexp@v6.2.1/index.ts";
+import { match, type MatchResult } from "path-to-regexp";
 
-import { createContext, type Operation } from "./deps/effection.ts";
+import { createContext, type Operation } from "effection";
 import { concat } from "./middleware.ts";
+import type { ParamData } from "path-to-regexp";
 
-const ParamsContext = createContext<MatchResult["params"]>("revolution.params");
+const ParamsContext = createContext<MatchResult<ParamData>["params"]>(
+  "revolution.params",
+);
 
 export function* useParams<T extends object>(): Operation<T> {
-  return (yield* ParamsContext) as T;
+  return (yield* ParamsContext.expect()) as T;
 }
 
 function buildMethodRoute<T>(

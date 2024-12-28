@@ -1,8 +1,6 @@
 import { describe, expect, it } from "./suite.ts";
 import { createRevolution, route, sse, useParams } from "../mod.ts";
-import { call, sleep, suspend } from "../lib/deps/effection.ts";
-import { spawn } from "../lib/deps/effection.ts";
-import { useAbortSignal } from "https://deno.land/x/effection@3.0.3/mod.ts";
+import { call, sleep, spawn, suspend, useAbortSignal } from "effection";
 
 describe("streaming responses", () => {
   it("can consume an SSE stream", function* () {
