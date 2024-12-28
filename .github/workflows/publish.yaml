@@ -3,7 +3,7 @@ name: Publish
 on:
   push:
     tags:
-      - "effection-v*"
+      - "v*"
 
 permissions:
   contents: read
