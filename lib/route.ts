@@ -1,10 +1,8 @@
-import type { Middleware } from "./types.ts";
-
-import { match, type MatchResult } from "path-to-regexp";
-
 import { createContext, type Operation } from "effection";
+import { match, type MatchResult, type ParamData } from "path-to-regexp";
+
 import { concat } from "./middleware.ts";
-import type { ParamData } from "path-to-regexp";
+import type { Middleware } from "./types.ts";
 
 const ParamsContext = createContext<MatchResult<ParamData>["params"]>(
   "revolution.params",

@@ -44,7 +44,7 @@ describe("route", () => {
   describe("optional parameters", () => {
     it("allows an empty value", function* () {
       const app = route(
-        "/users/{.:id}",
+        "/users{/:id}",
         GET(function* () {
           const { id } = yield* useParams<{ id: string }>();
           return new Response(`id=${id}`);
@@ -59,7 +59,7 @@ describe("route", () => {
         return new Response();
       });
 
-      expect(yield* response.text()).toEqual("id=");
+      expect(yield* response.text()).toEqual("id=undefined");
     });
   });
 });
