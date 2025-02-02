@@ -40,4 +40,26 @@ describe("route", () => {
       expect(yield* response.text()).toEqual("id=cowboyd");
     });
   });
+
+  describe("optional parameters", () => {
+    it("allows an empty value", function* () {
+      const app = route(
+        "/users{/:id}",
+        GET(function* () {
+          const { id } = yield* useParams<{ id: string }>();
+          return new Response(`id=${id}`);
+        }),
+      );
+
+      let request = new Request("http://localhost:8080/users");
+
+      let response = yield* app(request, function* () {
+        throw new Error("SHOULD NEVER HIT");
+        // deno-lint-ignore no-unreachable
+        return new Response();
+      });
+
+      expect(yield* response.text()).toEqual("id=undefined");
+    });
+  });
 });
