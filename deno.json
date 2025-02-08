@@ -1,6 +1,5 @@
 {
   "name": "@frontside/revolution",
-  "exports": "./mod.ts",
   "license": "ISC",
   "publish": {
     "exclude": [
@@ -11,6 +10,10 @@
     "test": "deno test --allow-read --allow-write --allow-env --allow-run --allow-net",
     "build:npm": "deno run -A tasks/build-npm.ts",
     "build:jsr": "deno run -A tasks/build-jsr.ts"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./jsx-runtime": "./jsx-runtime.ts"
   },
   "lint": {
     "rules": {
@@ -30,6 +33,7 @@
     "@std/path": "jsr:@std/path@1.0.8",
     "@std/http": "jsr:@std/http@1.0.12",
     "hast": "npm:@types/hast@^3.0.0",
+    "hastx": "npm:hastx@0.0.11",
     "@std/testing": "jsr:@std/testing@1.0.8",
     "revolution/jsx-runtime": "./jsx-runtime.ts",
     "path-to-regexp": "npm:path-to-regexp@8.2.0"
