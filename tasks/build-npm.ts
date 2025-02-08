@@ -10,7 +10,13 @@ if (!version) {
 }
 
 await build({
-  entryPoints: ["./mod.ts"],
+  entryPoints: [
+    "./mod.ts",
+    {
+      name: "./jsx-runtime",
+      path: "jsx-runtime.ts"
+    }
+  ],
   outDir,
   shims: {
     deno: false,
