@@ -1,6 +1,7 @@
-import type * as html from "https://deno.land/x/hastx@v0.0.10/html.ts";
+import type * as html from "hastx/html";
 import type * as hast from "hast";
 import type { JSXChild, JSXElement } from "./lib/types.ts";
+
 export type * from "./lib/types.ts";
 
 export type JSXElementProps = Record<string, string> & {
