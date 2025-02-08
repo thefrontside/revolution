@@ -14,8 +14,8 @@ await build({
     "./mod.ts",
     {
       name: "./jsx-runtime",
-      path: "jsx-runtime.ts"
-    }
+      path: "jsx-runtime.ts",
+    },
   ],
   outDir,
   shims: {
