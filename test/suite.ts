@@ -9,7 +9,7 @@ import {
 } from "effection";
 import { assert } from "@std/assert";
 export { assert };
-export { expect } from "https://deno.land/x/expect@v0.2.9/mod.ts";
+export { expect } from "expect";
 export { expectType } from "npm:ts-expect";
 
 let error: Error | void = void (0);
@@ -79,8 +79,8 @@ it.only = function only(desc: string, op?: () => Operation<void>): void {
   }
 };
 
-import { DOMImplementation } from "https://deno.land/x/deno_dom@v0.1.41/deno-dom-wasm.ts";
-import { CTOR_KEY } from "https://deno.land/x/deno_dom@v0.1.41/src/constructor-lock.ts";
+import { DOMImplementation } from "deno-dom/wasm";
+import { CTOR_KEY } from "deno-dom/constructor-lock";
 
 export function createHTMLDocument() {
   return new DOMImplementation(CTOR_KEY)
