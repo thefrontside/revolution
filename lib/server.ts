@@ -2,7 +2,7 @@ import type { Operation } from "effection";
 import type { Handler } from "./types.ts";
 
 import { action, call, once, race, resource, useScope } from "effection";
-import { getframe } from "effection";
+import { ParamsContext } from "./route.ts";
 
 export interface ServerInfo {
   hostname: string;
@@ -16,7 +16,7 @@ export interface ServerOptions {
 
 interface Driver {
   operation(): Operation<void>;
-  context: Record<string, unknown>;
+  params: Record<string, string | undefined> | undefined;
 }
 export const _driver = Symbol.for("revolution.driver");
 
@@ -38,8 +38,10 @@ export function useServer(options: ServerOptions): Operation<ServerInfo> {
 
         if (driver) {
           scope.run(function* () {
-            let frame = yield* getframe();
-            Object.assign(frame.context, driver.context);
+            // Restore the captured params context if it was set
+            if (driver.params) {
+              yield* ParamsContext.set(driver.params);
+            }
 
             try {
               yield* race([aborted(request), driver.operation()]);
@@ -55,17 +57,17 @@ export function useServer(options: ServerOptions): Operation<ServerInfo> {
         return response;
       });
 
-    let info = yield* action<ServerInfo>(
-      function* (resolve) {
-        server = Deno.serve({
-          handler,
-          port: options.port,
-          onListen(info) {
-            resolve(info);
-          },
-        });
-      },
-    );
+    let info = yield* action<ServerInfo>((resolve, _reject) => {
+      server = Deno.serve({
+        handler,
+        port: options.port,
+        onListen(info) {
+          resolve(info);
+        },
+      });
+      // Return cleanup function (required by both effection v3 and v4)
+      return () => {};
+    });
     try {
       yield* provide(info);
     } finally {
@@ -89,11 +91,13 @@ export function* drive(
   response: Response,
   operation: () => Operation<void>,
 ): Operation<Response> {
-  let { context } = yield* getframe();
+  // Capture the current params context so it can be restored in the driver scope
+  let params = yield* ParamsContext.get();
+
   return Object.create(response, {
     [_driver]: {
       enumerable: false,
-      value: { context, operation },
+      value: { params, operation },
     },
   });
 }

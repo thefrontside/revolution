@@ -4,7 +4,7 @@ import { match, type MatchResult, type ParamData } from "path-to-regexp";
 import { concat } from "./middleware.ts";
 import type { Middleware } from "./types.ts";
 
-const ParamsContext = createContext<MatchResult<ParamData>["params"]>(
+export const ParamsContext = createContext<MatchResult<ParamData>["params"]>(
   "revolution.params",
 );
 

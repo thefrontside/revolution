@@ -29,6 +29,7 @@ await build({
     target: "ES2020",
     sourceMap: true,
   },
+
   package: {
     // package.json properties
     name: "@frontside/revolution",
@@ -47,6 +48,9 @@ await build({
       node: ">= 18",
     },
     sideEffects: false,
+    peerDependencies: {
+      effection: "^3.0.0 || ^4.0.0",
+    },
   },
 });
 

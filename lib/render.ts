@@ -5,7 +5,7 @@ export const CurrentSlot = createContext<Slot>("slot");
 export const CurrentDocument = createContext<Document>("document");
 
 export function* useDocument() {
-  return yield* CurrentDocument;
+  return yield* CurrentDocument.expect();
 }
 
 type ASTNode = JSXElement;
@@ -13,9 +13,9 @@ type ASTNode = JSXElement;
 export function render(jsx: JSXElement): Operation<void> {
   return {
     *[Symbol.iterator]() {
-      let doc = yield* CurrentDocument;
+      let doc = yield* CurrentDocument.expect();
       let nodes = toNodes(jsx, doc);
-      let slot = yield* CurrentSlot;
+      let slot = yield* CurrentSlot.expect();
       slot.replace(...nodes);
     },
   };

@@ -99,6 +99,10 @@ declare global {
 
 Object.defineProperty(Promise.prototype, Symbol.iterator, {
   get<T>(this: Promise<T>) {
-    return call(this)[Symbol.iterator];
+    // Wrap the promise in a function for v4 compatibility
+    // v3 accepted call(promise) directly, v4 requires call(() => promise)
+    // deno-lint-ignore no-this-alias
+    const promise = this;
+    return call(() => promise)[Symbol.iterator];
   },
 });
