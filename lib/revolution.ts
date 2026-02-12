@@ -44,7 +44,7 @@ const RevolutionOptions: Context<RevolutionOptions> = createContext<
 );
 
 export function* useRevolutionOptions(): Operation<RevolutionOptions> {
-  return yield* RevolutionOptions;
+  return yield* RevolutionOptions.expect();
 }
 
 function createApp({
