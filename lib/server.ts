@@ -26,8 +26,8 @@ export function useServer(options: ServerOptions): Operation<ServerInfo> {
 
     let server: Deno.HttpServer;
 
-    let handler = (request: Request) =>
-      scope.run(function* () {
+    let handler = async (request: Request) => {
+      let { response, driver } = await scope.run(function* () {
         let response = yield* race([
           aborted(request),
           options.handler(request),
@@ -36,26 +36,29 @@ export function useServer(options: ServerOptions): Operation<ServerInfo> {
         //@ts-expect-error it's either there or it's not.
         const driver: Driver = response[_driver];
 
-        if (driver) {
-          scope.run(function* () {
-            // Restore the captured params context if it was set
-            if (driver.params) {
-              yield* ParamsContext.set(driver.params);
-            }
-
-            try {
-              yield* race([aborted(request), driver.operation()]);
-            } catch (error) {
-              // See https://github.com/denoland/deno/issues/10829
-              if (error !== "resource closed") {
-                throw error;
-              }
-            }
-          });
-        }
-
-        return response;
+        return { response, driver };
       });
+
+      if (driver) {
+        void scope.run(function* () {
+          // Restore the captured params context if it was set
+          if (driver.params) {
+            yield* ParamsContext.set(driver.params);
+          }
+
+          try {
+            yield* race([aborted(request), driver.operation()]);
+          } catch (error) {
+            // See https://github.com/denoland/deno/issues/10829
+            if (error !== "resource closed") {
+              throw error;
+            }
+          }
+        });
+      }
+
+      return response;
+    };
 
     let info = yield* action<ServerInfo>((resolve, _reject) => {
       server = Deno.serve({
