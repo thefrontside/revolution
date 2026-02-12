@@ -1,6 +1,6 @@
 import type { HASTHtmlNode } from "../types.ts";
 
-import { toHtml } from "npm:hast-util-to-html@9.0.0";
+import { toHtml } from "hast-util-to-html";
 
 export function serializeHtml(node: HASTHtmlNode): Response {
   let doctype = { type: "doctype" } as const;

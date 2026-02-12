@@ -2,7 +2,7 @@ import { join } from "@std/path";
 import { call, type Operation } from "effection";
 import type { BuildResult } from "esbuild";
 import * as esbuild from "esbuild";
-import { denoPlugins } from "jsr:@luca/esbuild-deno-loader@0.11.1";
+import { denoPlugins } from "esbuild-deno-loader";
 
 import type { IslandCollection } from "./island.ts";
 
