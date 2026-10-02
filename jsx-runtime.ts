@@ -48,7 +48,7 @@ export function jsx(
   if (typeof type === "string") {
     let tagName = type;
     let { children, ...properties } = props as JSXElementProps;
-    let className = properties.class ? { className: properties.class } : null;
+    let className = properties.class ? { className: [properties.class] } : null;
 
     return {
       type: "element",

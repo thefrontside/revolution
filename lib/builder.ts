@@ -1,6 +1,5 @@
 import { join } from "@std/path";
-import { call, type Operation } from "effection";
-import type { BuildResult } from "esbuild";
+import { type Operation, until } from "effection";
 import * as esbuild from "esbuild";
 import { denoPlugins } from "esbuild-deno-loader";
 
@@ -41,7 +40,7 @@ export function* buildIslandBootstrap(
   );
 
   try {
-    let result = yield* call<BuildResult>(esbuild.build({
+    let result = yield* until(esbuild.build({
       plugins: [...denoPlugins({
         configPath: new URL("../deno.json", import.meta.url).pathname,
       })],

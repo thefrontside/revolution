@@ -49,7 +49,7 @@ await build({
     },
     sideEffects: false,
     peerDependencies: {
-      effection: "^3.0.0 || ^4.0.0",
+      effection: "^4.0.0",
     },
   },
 });
