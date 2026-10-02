@@ -1,6 +1,13 @@
 import type { HTTPMiddleware } from "../types.ts";
 
-import { action, createContext, type Operation, suspend } from "effection";
+import {
+  createContext,
+  type Operation,
+  race,
+  scoped,
+  suspend,
+  withResolvers,
+} from "effection";
 
 const ResponseContext = createContext<(response: Response) => void>(
   "revolutions.httpResponse",
@@ -35,9 +42,10 @@ export function* respondRedirect(
 export function httpResponsesMiddleware(): HTTPMiddleware {
   return function* httpResponses(request, next): Operation<Response> {
     try {
-      return yield* action<Response>(function* (resolve) {
+      return yield* scoped(function* () {
+        let { operation, resolve } = withResolvers<Response>();
         yield* ResponseContext.set(resolve);
-        resolve(yield* next(request));
+        return yield* race([operation, next(request)]);
       });
     } catch (error) {
       return new Response((error as Error).stack, {

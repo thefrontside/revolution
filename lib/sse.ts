@@ -32,8 +32,10 @@ export function sse<
 
       let messages = createChannel<T, never>();
 
+      let subscription = yield* messages;
+
       yield* spawn(function* () {
-        for (let message of yield* each(messages)) {
+        for (let message of yield* each(subscription)) {
           yield* write(message);
           yield* each.next();
         }

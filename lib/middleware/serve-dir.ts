@@ -1,9 +1,9 @@
 import type { HTTPMiddleware } from "../types.ts";
-import { call } from "effection";
+import { until } from "effection";
 import { serveDir as server, type ServeDirOptions } from "@std/http";
 
 export function serveDirMiddleware(
   options?: ServeDirOptions,
 ): HTTPMiddleware {
-  return (request) => call(server(request, options));
+  return (request) => until(server(request, options));
 }

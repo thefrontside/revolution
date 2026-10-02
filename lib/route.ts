@@ -64,7 +64,9 @@ export function route<T>(
     let pathname = new URL(request.url).pathname;
     let result = match(path)(pathname);
     if (result) {
-      yield* ParamsContext.set(result.params);
+      // path-to-regexp returns a null-prototype object, which Effection's
+      // context tracing cannot stringify.
+      yield* ParamsContext.set({ ...result.params });
       return yield* inlinedMiddleware(request, next);
     } else {
       return yield* next(request);
