@@ -24,6 +24,17 @@ await build({
   test: false,
   typeCheck: false,
   scriptModule: false,
+  // `effection` is a peer dependency: the consumer's scopes and contexts only
+  // work if revolution and the consumer share one copy of it. Without this,
+  // dnt vendors the jsr module into the package and revolution runs its own.
+  mappings: {
+    effection: {
+      name: "effection",
+      version: "^4.0.0",
+      peerDependency: true,
+    },
+  },
+
   compilerOptions: {
     lib: ["ESNext", "DOM"],
     target: "ES2020",
